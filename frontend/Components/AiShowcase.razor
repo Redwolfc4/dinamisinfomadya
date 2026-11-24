@@ -1,7 +1,7 @@
 @using System.Threading
 @implements IDisposable
 
-<div class="showcase-card" @onmouseenter="PauseAutoPlay" @onmouseleave="ResumeAutoPlay">
+<div class="showcase-card">
     <!-- Header: Title and description that change smoothly per slide -->
     <div class="showcase-header">
         <h2 class="showcase-title">@CurrentSlide.Title</h2>
@@ -255,9 +255,9 @@
         </div>
     </div>
 
-    <!-- Bottom Showcase Footer: Pagination Dots & Interactive Controls -->
+    <!-- Bottom Showcase Footer: Centered Pagination Dots (Pure Auto-playing) -->
     <div class="showcase-footer">
-        <!-- Interactive Pagination Dots (matching screenshot) -->
+        <!-- Interactive Pagination Dots -->
         <div class="slide-dots">
             @for (int i = 0; i < Slides.Count; i++)
             {
@@ -269,27 +269,6 @@
                 </button>
             }
         </div>
-
-        <!-- Carousel navigation arrows & loop status -->
-        <div class="carousel-nav-arrows">
-            <span class="carousel-pause-toggle">
-                @if (isPaused)
-                {
-                    <span title="Carousel paused">⏸ Paused</span>
-                }
-                else
-                {
-                    <span title="Auto-cycling infinitely">⚡ Auto (@(ActiveIndex + 1)/@Slides.Count)</span>
-                }
-            </span>
-
-            <button type="button" class="btn-arrow-nav" @onclick="PrevSlide" title="Previous Slide">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <button type="button" class="btn-arrow-nav" @onclick="NextSlide" title="Next Slide">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-        </div>
     </div>
 </div>
 
@@ -297,7 +276,6 @@
     public record SlideItem(string Title, string Description);
 
     private int ActiveIndex = 0;
-    private bool isPaused = false;
     private Timer? autoPlayTimer;
 
     private readonly List<SlideItem> Slides = new()
@@ -315,25 +293,12 @@
         // Start infinite auto-advancing loop every 4.2 seconds
         autoPlayTimer = new Timer(async _ =>
         {
-            if (!isPaused)
+            await InvokeAsync(() =>
             {
-                await InvokeAsync(() =>
-                {
-                    ActiveIndex = (ActiveIndex + 1) % Slides.Count;
-                    StateHasChanged();
-                });
-            }
+                ActiveIndex = (ActiveIndex + 1) % Slides.Count;
+                StateHasChanged();
+            });
         }, null, 4200, 4200);
-    }
-
-    private void NextSlide()
-    {
-        ActiveIndex = (ActiveIndex + 1) % Slides.Count;
-    }
-
-    private void PrevSlide()
-    {
-        ActiveIndex = (ActiveIndex - 1 + Slides.Count) % Slides.Count;
     }
 
     private void GoToSlide(int index)
@@ -341,18 +306,9 @@
         ActiveIndex = index;
     }
 
-    private void PauseAutoPlay()
-    {
-        isPaused = true;
-    }
-
-    private void ResumeAutoPlay()
-    {
-        isPaused = false;
-    }
-
     public void Dispose()
     {
         autoPlayTimer?.Dispose();
     }
 }
+

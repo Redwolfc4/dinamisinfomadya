@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @layout AuthLayout
 
 <PageTitle>AI Labs — Select &amp; Combine &amp; Integrate</PageTitle>
@@ -231,12 +231,12 @@
                         <!-- Mode Switch Prompt -->
                         <div class="switch-mode-prompt">
                             <span>Don't have an account?</span>
-                            <button type="button" class="btn-switch-mode" @onclick="ToggleMode">Sign up</button>
+                            <button type="button" class="btn-switch-mode btn-to-register" @onclick="ToggleMode">Sign up</button>
                         </div>
 
                         <!-- Footer disclaimer -->
                         <p class="form-footer-disclaimer">
-                            By continuing, you agree to our <a href="javascript:void(0)">Terms of Service</a> and <a href="javascript:void(0)">Privacy Policy</a>.
+                            By continuing, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
                         </p>
                     </div>
                 }
@@ -362,7 +362,7 @@
                             <div class="form-options-row" style="margin: 0.75rem 0 1.25rem 0;">
                                 <label class="checkbox-label" style="font-size: 0.78rem;">
                                     <input type="checkbox" class="custom-checkbox" @bind="agreeTerms" required />
-                                    <span>I agree to the <a href="javascript:void(0)" class="link-forgot">Terms</a> &amp; <a href="javascript:void(0)" class="link-forgot">Privacy Policy</a></span>
+                                    <span>I agree to the <a href="/terms" class="link-forgot">Terms</a> &amp; <a href="/privacy" class="link-forgot">Privacy Policy</a></span>
                                 </label>
                             </div>
 
@@ -383,7 +383,7 @@
                         <!-- Switch back to Login -->
                         <div class="switch-mode-prompt">
                             <span>Already have an account?</span>
-                            <button type="button" class="btn-switch-mode" @onclick="ToggleMode">Sign in</button>
+                            <button type="button" class="btn-switch-mode btn-to-login" @onclick="ToggleMode">Sign in</button>
                         </div>
                     </div>
                 }

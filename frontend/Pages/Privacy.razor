@@ -1,0 +1,151 @@
+@page "/privacy"
+@layout AuthLayout
+@inject NavigationManager Navigation
+
+<PageTitle>Privacy Policy — AI Labs</PageTitle>
+
+<div class="auth-page-root">
+    <div class="browser-window">
+        <!-- Browser Top Bar -->
+        <div class="browser-header">
+            <!-- macOS Traffic Light Buttons -->
+            <div class="traffic-lights">
+                <span class="traffic-dot close" title="Back to Home" @onclick='() => Navigation.NavigateTo("/")'></span>
+                <span class="traffic-dot minimize" title="Minimize"></span>
+                <span class="traffic-dot maximize" title="Fullscreen"></span>
+            </div>
+
+            <!-- Browser Navigation Buttons -->
+            <div class="browser-nav-actions">
+                <a href="/" class="browser-nav-btn" title="Back to Sign In">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                </a>
+                <button type="button" class="browser-nav-btn" disabled title="Forward">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+            </div>
+
+            <!-- Address Bar -->
+            <div class="address-bar-wrapper">
+                <div class="address-bar">
+                    <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <span>labs.ai/privacy</span>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="browser-right-actions">
+                <a href="/" class="browser-nav-btn" title="Close and return">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Document Body -->
+        <div class="legal-wrapper">
+            <!-- Header Hero -->
+            <header class="legal-header-hero">
+                <div class="legal-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Data Privacy &amp; Trust
+                </div>
+                <h1 class="legal-title">Privacy Policy</h1>
+                <p class="legal-subtitle">We believe your code, models, and data are your own. Here is how we safeguard your privacy across every AI Labs interaction.</p>
+
+                <!-- Navigation Tabs -->
+                <div class="legal-nav-tabs">
+                    <a href="/terms" class="legal-tab-link">Terms of Service</a>
+                    <a href="/privacy" class="legal-tab-link active">Privacy Policy</a>
+                </div>
+            </header>
+
+            <!-- Document Content -->
+            <article class="legal-content-body">
+                <div class="legal-meta-box">
+                    <div class="legal-meta-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Last Updated: November 24, 2026</span>
+                    </div>
+                    <div class="legal-meta-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>SOC-2 Type II &amp; ISO 27001 Certified</span>
+                    </div>
+                </div>
+
+                <div class="legal-callout-card">
+                    <div class="legal-callout-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="legal-callout-body">
+                        <h4>Zero Model Training on Customer Data</h4>
+                        <p>AI Labs does not use your proprietary code, prompts, embeddings, or inference outputs to train foundational models without your express opt-in consent.</p>
+                    </div>
+                </div>
+
+                <section class="legal-section">
+                    <h2 class="legal-section-title">
+                        <span class="legal-section-num">01</span>
+                        Information We Collect
+                    </h2>
+                    <p class="legal-section-text">
+                        We collect minimal information necessary to deliver and secure our cloud services:
+                    </p>
+                    <ul class="legal-section-list">
+                        <li><strong>Account Data:</strong> Name, work email address, encrypted password hash, and organization name.</li>
+                        <li><strong>Usage Telemetry:</strong> API execution timestamps, model invocation latency, token counts, and error rates to monitor platform reliability.</li>
+                        <li><strong>Device &amp; Session Data:</strong> IP address, browser type, operating system, and security tokens for fraud prevention.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2 class="legal-section-title">
+                        <span class="legal-section-num">02</span>
+                        How We Protect Your Data
+                    </h2>
+                    <p class="legal-section-text">
+                        Security is built into our foundational infrastructure:
+                    </p>
+                    <ul class="legal-section-list">
+                        <li><strong>Encryption in Transit:</strong> All data transmitted between your browser, APIs, and model endpoints is encrypted via TLS 1.3.</li>
+                        <li><strong>Encryption at Rest:</strong> Database records, secrets, and stored artifacts use AES-256 bit hardware-level encryption.</li>
+                        <li><strong>Role-Based Access Control (RBAC):</strong> Strict least-privilege policies ensure only authorized automated services access processing nodes.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h2 class="legal-section-title">
+                        <span class="legal-section-num">03</span>
+                        Data Retention &amp; Deletion
+                    </h2>
+                    <p class="legal-section-text">
+                        You hold full control over your stored records. You may request complete deletion of your account and associated project workspaces at any time through your account preferences or by contacting our Data Protection Officer.
+                    </p>
+                </section>
+
+                <section class="legal-section">
+                    <h2 class="legal-section-title">
+                        <span class="legal-section-num">04</span>
+                        Compliance &amp; Your Legal Rights
+                    </h2>
+                    <p class="legal-section-text">
+                        We adhere to international privacy frameworks including GDPR (General Data Protection Regulation), CCPA (California Consumer Privacy Act), and applicable PDP (Pelindungan Data Pribadi) standards. You have the right to access, rectify, export, or erase your personal data at any time.
+                    </p>
+                </section>
+
+                <footer class="legal-footer-nav">
+                    <a href="/" class="btn-legal-back">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back to Sign In
+                    </a>
+                    <div class="legal-contact-text">
+                        Privacy concerns or requests? <a href="mailto:privacy@labs.ai">Contact privacy@labs.ai</a>
+                    </div>
+                </footer>
+            </article>
+        </div>
+    </div>
+</div>
+
