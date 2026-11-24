@@ -1,3 +1,0 @@
-[      56ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5181/_framework/dotnet.wjksogfan4.js:0
-[     861ms] Error: Failed to start platform. Reason: TypeError: Failed to fetch dynamically imported module: http://localhost:5181/_framework/dotnet.wjksogfan4.js
-    at Zt (http://localhost:5181/_framework/blazor.webassembly.w3qd1tpl0e.js:1:58780)

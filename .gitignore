@@ -70,3 +70,11 @@ node_modules/
 *.coveragexml
 test-results/
 
+# Playwright & Browser Testing Artifacts
+.playwright/
+.playwright-mcp/
+playwright-report/
+playwright/.cache/
+blob-report/
+playwright-artifacts/
+
