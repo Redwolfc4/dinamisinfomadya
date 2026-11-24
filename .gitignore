@@ -23,11 +23,7 @@ dist/
 *.svclog
 
 # Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode/
 
 # Local Environment & Secrets
 appsettings.*.local.json
