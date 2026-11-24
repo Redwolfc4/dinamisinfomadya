@@ -1,0 +1,358 @@
+@using System.Threading
+@implements IDisposable
+
+<div class="showcase-card" @onmouseenter="PauseAutoPlay" @onmouseleave="ResumeAutoPlay">
+    <!-- Header: Title and description that change smoothly per slide -->
+    <div class="showcase-header">
+        <h2 class="showcase-title">@CurrentSlide.Title</h2>
+        <p class="showcase-desc">@CurrentSlide.Description</p>
+    </div>
+
+    <!-- Graphic Canvas Stage -->
+    <div class="graphic-stage-viewport">
+        <!-- ===================================================================
+             SLIDE 1: AI Model Constellation (Exact Match from Screenshot)
+             =================================================================== -->
+        <div class="slide-content-container @(ActiveIndex == 0 ? "slide-active" : "")">
+            <div class="constellation-wrapper">
+                <!-- SVG Connector Lines -->
+                <svg class="constellation-svg-lines" viewBox="0 0 380 340">
+                    <defs>
+                        <linearGradient id="lineGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#818cf8" stop-opacity="0.9" />
+                            <stop offset="100%" stop-color="#c084fc" stop-opacity="0.9" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Center to Top-Left (Meta) -->
+                    <line x1="190" y1="170" x2="68" y2="78" class="connector-line" />
+                    <line x1="190" y1="170" x2="68" y2="78" class="pulse-line" />
+
+                    <!-- Center to Top-Center (RunPod) -->
+                    <line x1="190" y1="170" x2="190" y2="40" class="connector-line" />
+                    <line x1="190" y1="170" x2="190" y2="40" class="pulse-line" />
+
+                    <!-- Center to Top-Right (ElevenLabs) -->
+                    <line x1="190" y1="170" x2="312" y2="78" class="connector-line" />
+                    <line x1="190" y1="170" x2="312" y2="78" class="pulse-line" />
+
+                    <!-- Center to Mid-Left (HuggingFace/Custom) -->
+                    <line x1="190" y1="170" x2="42" y2="170" class="connector-line" />
+                    <line x1="190" y1="170" x2="42" y2="170" class="pulse-line" />
+
+                    <!-- Center to Mid-Right (Anthropic/Custom) -->
+                    <line x1="190" y1="170" x2="338" y2="170" class="connector-line" />
+                    <line x1="190" y1="170" x2="338" y2="170" class="pulse-line" />
+
+                    <!-- Center to Bot-Left (OpenAI) -->
+                    <line x1="190" y1="170" x2="68" y2="262" class="connector-line" />
+                    <line x1="190" y1="170" x2="68" y2="262" class="pulse-line" />
+
+                    <!-- Center to Bot-Center (Replicate/Weights) -->
+                    <line x1="190" y1="170" x2="190" y2="300" class="connector-line" />
+                    <line x1="190" y1="170" x2="190" y2="300" class="pulse-line" />
+
+                    <!-- Center to Bot-Right (Cohere) -->
+                    <line x1="190" y1="170" x2="312" y2="262" class="connector-line" />
+                    <line x1="190" y1="170" x2="312" y2="262" class="pulse-line" />
+
+                    <!-- Outer subtle interconnecting lines -->
+                    <line x1="68" y1="78" x2="190" y2="40" class="connector-line" stroke-opacity="0.4" />
+                    <line x1="190" y1="40" x2="312" y2="78" class="connector-line" stroke-opacity="0.4" />
+                    <line x1="68" y1="262" x2="190" y2="300" class="connector-line" stroke-opacity="0.4" />
+                    <line x1="190" y1="300" x2="312" y2="262" class="connector-line" stroke-opacity="0.4" />
+                </svg>
+
+                <!-- Center Node (AI Labs Icon) -->
+                <div class="center-ai-node" title="AI Labs Core Platform">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="5" />
+                        <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
+                        <circle cx="15.5" cy="10" r="1.5" fill="currentColor" />
+                        <path d="M8 15a4 4 0 0 0 8 0" stroke-width="2.2" />
+                    </svg>
+                </div>
+
+                <!-- 1. Top-Left: Meta -->
+                <div class="satellite-node pos-top-left" title="Meta LLaMA">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0081fb" stroke-width="2.4" stroke-linecap="round">
+                        <path d="M7 15c-2.5 0-4-1.8-4-4s1.5-4 4-4c2.5 0 3.5 3 5 5 1.5 2 2.5 5 5 5s4-1.8 4-4-1.5-4-4-4c-2.5 0-3.5 3-5 5-1.5 2-2.5 5-5 5z" />
+                    </svg>
+                </div>
+
+                <!-- 2. Top-Center: RunPod -->
+                <div class="satellite-node pos-top-center" style="background: #0f172a;" title="RunPod GPU Cloud">
+                    <span style="font-weight: 800; color: #ffffff; font-size: 1.15rem; font-family: var(--font-sans);">R</span>
+                </div>
+
+                <!-- 3. Top-Right: ElevenLabs -->
+                <div class="satellite-node pos-top-right" title="ElevenLabs Voice AI">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="7" y1="5" x2="7" y2="19" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="17" y1="4" x2="17" y2="20" />
+                    </svg>
+                </div>
+
+                <!-- 4. Mid-Left: HuggingFace / Open Weights -->
+                <div class="satellite-node pos-mid-left" style="background: #18181b;" title="Hugging Face Open Models">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 10h.01M16 10h.01" stroke-width="3" stroke-linecap="round" />
+                        <path d="M9 15c1 1 5 1 6 0" stroke-linecap="round" />
+                    </svg>
+                </div>
+
+                <!-- 5. Mid-Right: Custom Models / Anthropic -->
+                <div class="satellite-node pos-mid-right" style="background: #09090b;" title="Anthropic Claude">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5">
+                        <path d="M5 19L12 5l7 14M8.5 14h7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+
+                <!-- 6. Bot-Left: OpenAI / ChatGPT -->
+                <div class="satellite-node pos-bot-left" title="OpenAI GPT-4o">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2a4 4 0 0 1 4 4v1M20.66 7a4 4 0 0 1 0 5.66l-.87.5M20.66 17a4 4 0 0 1-3.46 2l-1-.2M12 22a4 4 0 0 1-4-4v-1M3.34 17a4 4 0 0 1 0-5.66l.87-.5M3.34 7a4 4 0 0 1 3.46-2l1 .2" />
+                    </svg>
+                </div>
+
+                <!-- 7. Bot-Center: Replicate / Engine -->
+                <div class="satellite-node pos-bot-center" style="background: #0f172a;" title="Replicate Serverless Inference">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
+                        <path d="M4 6h16M4 12h11M4 18h7" />
+                    </svg>
+                </div>
+
+                <!-- 8. Bot-Right: Cohere / Qdrant -->
+                <div class="satellite-node pos-bot-right" title="Cohere Command R+">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.4" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="8" />
+                        <path d="M12 8v8M8 12h8" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             SLIDE 2: Autonomous Neural Pipeline
+             =================================================================== -->
+        <div class="slide-content-container @(ActiveIndex == 1 ? "slide-active" : "")">
+            <div class="pipeline-flow-wrapper">
+                <div class="pipeline-step-card">
+                    <div class="step-icon-badge">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="step-meta">
+                        <p class="step-title">Multi-Modal Ingest Stream</p>
+                        <p class="step-subtitle">Text, Voice, Images &amp; Documents</p>
+                    </div>
+                    <span class="step-metric">Active</span>
+                </div>
+
+                <div class="pipeline-step-card active">
+                    <div class="step-icon-badge">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </div>
+                    <div class="step-meta">
+                        <p class="step-title">Neural Transformer Reasoning</p>
+                        <p class="step-subtitle">Dynamic MoE + Vector Embeddings</p>
+                    </div>
+                    <span class="step-metric badge-success">0.42 ms</span>
+                </div>
+
+                <div class="pipeline-step-card">
+                    <div class="step-icon-badge">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="step-meta">
+                        <p class="step-title">Instant Edge Tool Execution</p>
+                        <p class="step-subtitle">Zero-latency API &amp; Agent Actions</p>
+                    </div>
+                    <span class="step-metric badge-success">Stream Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             SLIDE 3: Intelligent Swarm Workflows
+             =================================================================== -->
+        <div class="slide-content-container @(ActiveIndex == 2 ? "slide-active" : "")">
+            <div class="swarm-mesh-wrapper">
+                <div class="swarm-radar-ring"></div>
+
+                <!-- Central Coordinator -->
+                <div class="center-ai-node" style="width: 56px; height: 56px;">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </div>
+
+                <!-- Floating Agents -->
+                <div class="agent-node" style="top: 15%; left: 8%;">
+                    <div class="agent-dot-status"></div>
+                    <span>Researcher Agent</span>
+                </div>
+
+                <div class="agent-node" style="top: 18%; right: 6%; animation-delay: 1s;">
+                    <div class="agent-dot-status" style="background: #3b82f6;"></div>
+                    <span>Fullstack Coder</span>
+                </div>
+
+                <div class="agent-node" style="bottom: 18%; left: 10%; animation-delay: 2s;">
+                    <div class="agent-dot-status" style="background: #10b981;"></div>
+                    <span>Code Verifier</span>
+                </div>
+
+                <div class="agent-node" style="bottom: 14%; right: 8%; animation-delay: 1.5s;">
+                    <div class="agent-dot-status" style="background: #f59e0b;"></div>
+                    <span>API Synthesizer</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             SLIDE 4: Real-Time Edge Telemetry & Latency
+             =================================================================== -->
+        <div class="slide-content-container @(ActiveIndex == 3 ? "slide-active" : "")">
+            <div class="telemetry-wrapper">
+                <div class="telemetry-top">
+                    <div>
+                        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Realtime Edge Mesh</span>
+                        <h4 style="margin: 0; font-size: 1rem; color: #ffffff;">Tokyo-US-Frankfurt</h4>
+                    </div>
+                    <span class="telemetry-badge">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #34d399; display: inline-block;"></span>
+                        Live 99.99%
+                    </span>
+                </div>
+
+                <div class="telemetry-stat-grid">
+                    <div class="telemetry-box">
+                        <div class="telemetry-label">STREAM SPEED</div>
+                        <div class="telemetry-val">142 <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">tok/s</span></div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="telemetry-label">TTFT LATENCY</div>
+                        <div class="telemetry-val">14.8 <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">ms</span></div>
+                    </div>
+                </div>
+
+                <!-- Animated Telemetry Waveform -->
+                <svg class="waveform-svg" viewBox="0 0 320 60">
+                    <defs>
+                        <linearGradient id="waveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5" />
+                            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,45 Q40,10 80,30 T160,20 T240,40 T320,15 L320,60 L0,60 Z" fill="url(#waveGrad)" />
+                    <path d="M0,45 Q40,10 80,30 T160,20 T240,40 T320,15" fill="none" stroke="#38bdf8" stroke-width="2.5" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Showcase Footer: Pagination Dots & Interactive Controls -->
+    <div class="showcase-footer">
+        <!-- Interactive Pagination Dots (matching screenshot) -->
+        <div class="slide-dots">
+            @for (int i = 0; i < Slides.Count; i++)
+            {
+                var idx = i;
+                <button type="button" 
+                        class="slide-dot @(ActiveIndex == idx ? "active" : "")" 
+                        @onclick="() => GoToSlide(idx)"
+                        aria-label="Go to slide @(idx + 1)">
+                </button>
+            }
+        </div>
+
+        <!-- Carousel navigation arrows & loop status -->
+        <div class="carousel-nav-arrows">
+            <span class="carousel-pause-toggle">
+                @if (isPaused)
+                {
+                    <span title="Carousel paused">⏸ Paused</span>
+                }
+                else
+                {
+                    <span title="Auto-cycling infinitely">⚡ Auto (@(ActiveIndex + 1)/@Slides.Count)</span>
+                }
+            </span>
+
+            <button type="button" class="btn-arrow-nav" @onclick="PrevSlide" title="Previous Slide">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button type="button" class="btn-arrow-nav" @onclick="NextSlide" title="Next Slide">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    public record SlideItem(string Title, string Description);
+
+    private int ActiveIndex = 0;
+    private bool isPaused = false;
+    private Timer? autoPlayTimer;
+
+    private readonly List<SlideItem> Slides = new()
+    {
+        new SlideItem("Select & Combine & Integrate.", "Develop and refine AI models using our intuitive interface."),
+        new SlideItem("Autonomous Neural Pipelines.", "Connect LLMs, vector search, and custom tools with low-latency streaming."),
+        new SlideItem("Intelligent Swarm Workflows.", "Coordinate specialized AI agents with unified context & persistent memory."),
+        new SlideItem("Ultra-low Latency Inference.", "Deploy across global edge nodes with instant cold-start and live telemetry.")
+    };
+
+    private SlideItem CurrentSlide => Slides[ActiveIndex];
+
+    protected override void OnInitialized()
+    {
+        // Start infinite auto-advancing loop every 4.2 seconds
+        autoPlayTimer = new Timer(async _ =>
+        {
+            if (!isPaused)
+            {
+                await InvokeAsync(() =>
+                {
+                    ActiveIndex = (ActiveIndex + 1) % Slides.Count;
+                    StateHasChanged();
+                });
+            }
+        }, null, 4200, 4200);
+    }
+
+    private void NextSlide()
+    {
+        ActiveIndex = (ActiveIndex + 1) % Slides.Count;
+    }
+
+    private void PrevSlide()
+    {
+        ActiveIndex = (ActiveIndex - 1 + Slides.Count) % Slides.Count;
+    }
+
+    private void GoToSlide(int index)
+    {
+        ActiveIndex = index;
+    }
+
+    private void PauseAutoPlay()
+    {
+        isPaused = true;
+    }
+
+    private void ResumeAutoPlay()
+    {
+        isPaused = false;
+    }
+
+    public void Dispose()
+    {
+        autoPlayTimer?.Dispose();
+    }
+}

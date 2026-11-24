@@ -1,0 +1,2 @@
+[    1365ms] [INFO] Debugging hotkey: Shift+Alt+D (when application has focus) @ http://localhost:5181/_framework/blazor.webassembly.w3qd1tpl0e.js:0
+[    2134ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:5181/:0

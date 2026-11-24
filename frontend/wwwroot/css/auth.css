@@ -1,0 +1,1242 @@
+/* ==========================================================================
+   AI Labs - Premium Auth & Infinite Looping Showcase Styles
+   Designed for .NET 10 Blazor WebAssembly
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --bg-app: #f4f5f8;
+  --bg-card: #ffffff;
+  --bg-input: #f9fafb;
+  --bg-input-focus: #ffffff;
+  --border-light: #e5e7eb;
+  --border-focus: #111827;
+  
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  --btn-primary-bg: #0f172a;
+  --btn-primary-hover: #1e293b;
+  --btn-primary-text: #ffffff;
+  
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-purple: #8b5cf6;
+  
+  --ease-spring: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-speed: 0.75s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   Outer Page & macOS Browser Wrapper
+   ========================================================================== */
+.auth-page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 10% 20%, rgba(238, 242, 255, 0.8) 0%, rgba(244, 245, 248, 1) 90%);
+}
+
+.browser-window {
+  width: 100%;
+  max-width: 1240px;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.browser-window.fullscreen-mode {
+  max-width: 100%;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  min-height: 100vh;
+}
+
+/* Browser Header / Navigation Bar */
+.browser-header {
+  height: 52px;
+  background: #fbfbfb;
+  border-bottom: 1px solid #ebebeb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  user-select: none;
+}
+
+.traffic-lights {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.traffic-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.traffic-dot:hover {
+  opacity: 0.8;
+}
+
+.traffic-dot.close { background-color: #ff5f56; border: 1px solid #e0443e; }
+.traffic-dot.minimize { background-color: #ffbd2e; border: 1px solid #dea123; }
+.traffic-dot.maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+.browser-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8e8e93;
+}
+
+.browser-nav-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: #8e8e93;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.browser-nav-btn:hover {
+  background: #eef0f2;
+  color: #1c1c1e;
+}
+
+.address-bar-wrapper {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.address-bar {
+  width: 100%;
+  height: 32px;
+  background: #f0f1f4;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: #4b5563;
+  font-weight: 500;
+  padding: 0 12px;
+  position: relative;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.address-bar:hover {
+  background: #e9ebf0;
+}
+
+.address-bar .lock-icon {
+  width: 13px;
+  height: 13px;
+  color: #6b7280;
+}
+
+.address-bar .refresh-icon {
+  margin-left: auto;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.address-bar .refresh-icon:hover {
+  opacity: 1;
+}
+
+.browser-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8e8e93;
+}
+
+/* Top control banner / view switcher */
+.top-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.25rem;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.mode-badge.register-active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-pill-sm {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-pill-sm:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+/* ==========================================================================
+   Sliding Split Card Structure
+   ========================================================================== */
+.auth-stage {
+  position: relative;
+  width: 100%;
+  min-height: 720px;
+  display: flex;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.split-track {
+  display: flex;
+  width: 100%;
+  position: relative;
+  transition: transform var(--transition-speed) var(--ease-spring);
+}
+
+/* Panel Common */
+.auth-panel {
+  width: 50%;
+  flex-shrink: 0;
+  padding: 3rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform var(--transition-speed) var(--ease-spring), opacity 0.5s var(--ease-smooth);
+  position: relative;
+}
+
+/* When In Login Mode:
+   - Form Panel is on Left (translateX: 0)
+   - Showcase Panel is on Right (translateX: 0)
+*/
+.auth-stage.mode-login .panel-form {
+  transform: translateX(0%);
+  order: 1;
+}
+
+.auth-stage.mode-login .panel-showcase {
+  transform: translateX(0%);
+  order: 2;
+}
+
+/* When In Register Mode:
+   - Form Panel moves to Right (translateX: 100%)
+   - Showcase Panel moves to Left (translateX: -100%)
+*/
+.auth-stage.mode-register .panel-form {
+  transform: translateX(100%);
+  order: 1;
+}
+
+.auth-stage.mode-register .panel-showcase {
+  transform: translateX(-100%);
+  order: 2;
+}
+
+/* ==========================================================================
+   Left / Form Panel Styling (Pixel-Perfect from Image)
+   ========================================================================== */
+.form-content-wrap {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  animation: fadeInForm 0.5s ease;
+}
+
+@keyframes fadeInForm {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brand-icon-box {
+  width: 48px;
+  height: 48px;
+  background-color: #111827;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 10px 15px -3px rgba(17, 24, 39, 0.15);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brand-icon-box:hover {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.brand-icon-box svg {
+  width: 26px;
+  height: 26px;
+  color: #ffffff;
+}
+
+.form-heading {
+  font-size: 1.625rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.025em;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.form-subtext {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  margin: 0 0 1.75rem 0;
+  line-height: 1.4;
+}
+
+/* Social Buttons */
+.social-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-social {
+  width: 100%;
+  height: 44px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.btn-social:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-social .social-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+}
+
+.btn-social .btn-social-text {
+  flex: 1;
+  text-align: center;
+  margin-right: 24px; /* balance out icon */
+}
+
+/* Divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.or-divider span {
+  padding: 0 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+}
+
+/* Form Inputs */
+.form-field-group {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  width: 100%;
+  height: 42px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  color: #111827;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+}
+
+.input-container.has-error .form-input {
+  border-color: #ef4444;
+  background-color: #fffaf0;
+}
+
+.btn-eye-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.btn-eye-toggle:hover {
+  color: #4b5563;
+}
+
+/* Error Banner (matching the screenshot red circle with exclamation) */
+.form-error-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: #ef4444;
+  margin-top: 0.4rem;
+  animation: shakeAlert 0.3s ease;
+}
+
+@keyframes shakeAlert {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.form-error-alert svg {
+  flex-shrink: 0;
+}
+
+/* Row with Remember me & Forgot password */
+.form-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.1rem 0 1.5rem 0;
+  font-size: 0.8125rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #374151;
+  font-weight: 500;
+  user-select: none;
+}
+
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  accent-color: #111827;
+  cursor: pointer;
+}
+
+.link-forgot {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.link-forgot:hover {
+  text-decoration: underline;
+}
+
+/* Primary Action Button (Continue / Create Account) */
+.btn-primary-action {
+  width: 100%;
+  height: 46px;
+  background-color: #111827;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(17, 24, 39, 0.1);
+}
+
+.btn-primary-action:hover {
+  background-color: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 12px -2px rgba(17, 24, 39, 0.18);
+}
+
+.btn-primary-action:active {
+  transform: translateY(0);
+}
+
+.btn-primary-action:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Secondary Links */
+.help-links-wrap {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+
+.link-help {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.link-help:hover {
+  color: #111827;
+  text-decoration: underline;
+}
+
+/* Mode Switch Toggle Prompt */
+.switch-mode-prompt {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed #e5e7eb;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.btn-switch-mode {
+  background: none;
+  border: none;
+  color: #111827;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.btn-switch-mode:hover {
+  color: #3b82f6;
+}
+
+/* Form Footer Disclaimer */
+.form-footer-disclaimer {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.form-footer-disclaimer a {
+  color: #6b7280;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.form-footer-disclaimer a:hover {
+  color: #111827;
+}
+
+/* Password Strength Indicator */
+.strength-meter {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.strength-bar {
+  height: 3px;
+  flex: 1;
+  background: #e5e7eb;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+.strength-bar.active-weak { background: #ef4444; }
+.strength-bar.active-medium { background: #f59e0b; }
+.strength-bar.active-strong { background: #10b981; }
+
+.strength-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ==========================================================================
+   Right / Showcase Panel (Infinite Carousel & Animated Generative Graphics)
+   ========================================================================== */
+.panel-showcase {
+  background: #fafafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+}
+
+.showcase-card {
+  width: 100%;
+  height: 100%;
+  max-width: 520px;
+  min-height: 600px;
+  background: #ffffff;
+  border: 1px solid #ebecee;
+  border-radius: 1.5rem;
+  padding: 2.5rem 2rem 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.showcase-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+}
+
+/* Showcase Header Text */
+.showcase-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  z-index: 2;
+}
+
+.showcase-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.showcase-desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  max-width: 340px;
+  margin: 0 auto;
+  line-height: 1.45;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Graphic Canvas Stage */
+.graphic-stage-viewport {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+  overflow: hidden;
+}
+
+/* Dynamic Slide Transition */
+.slide-content-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-content-container.slide-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* --------------------------------------------------------------------------
+   SLIDE 1: AI Model Constellation & Ecosystem (Matching Screenshot)
+   -------------------------------------------------------------------------- */
+.constellation-wrapper {
+  position: relative;
+  width: 380px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG Line Connections Layer */
+.constellation-svg-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.connector-line {
+  stroke: #e2e8f0;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.pulse-line {
+  stroke: #6366f1;
+  stroke-width: 2;
+  stroke-dasharray: 6 12;
+  animation: dashTravel 2.5s linear infinite;
+}
+
+@keyframes dashTravel {
+  from { stroke-dashoffset: 36; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Center Node */
+.center-ai-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: #111827;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  z-index: 10;
+  box-shadow: 0 12px 24px -4px rgba(17, 24, 39, 0.3);
+  animation: centerPulse 3s infinite ease-in-out;
+}
+
+@keyframes centerPulse {
+  0%, 100% {
+    box-shadow: 0 12px 24px -4px rgba(17, 24, 39, 0.3), 0 0 0 0 rgba(99, 102, 241, 0.4);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 16px 32px -4px rgba(17, 24, 39, 0.4), 0 0 0 12px rgba(99, 102, 241, 0);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+/* Orbiting Provider Nodes */
+.satellite-node {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.satellite-node:hover {
+  transform: scale(1.15) translateY(-2px);
+  border-color: #6366f1;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+/* Pre-positioned satellites based on grid layout */
+.pos-top-left     { top: 15%; left: 10%; }
+.pos-top-center   { top: 5%;  left: 50%; transform: translateX(-50%); }
+.pos-top-right    { top: 15%; right: 10%; }
+.pos-mid-left     { top: 50%; left: 4%;  transform: translateY(-50%); }
+.pos-mid-right    { top: 50%; right: 4%; transform: translateY(-50%); }
+.pos-bot-left     { bottom: 15%; left: 10%; }
+.pos-bot-center   { bottom: 5%;  left: 50%; transform: translateX(-50%); }
+.pos-bot-right    { bottom: 15%; right: 10%; }
+
+/* Hover adjustment when transforms are combined */
+.pos-top-center:hover { transform: translateX(-50%) scale(1.15) translateY(-2px); }
+.pos-mid-left:hover   { transform: translateY(-50%) scale(1.15); }
+.pos-mid-right:hover  { transform: translateY(-50%) scale(1.15); }
+.pos-bot-center:hover { transform: translateX(-50%) scale(1.15) translateY(-2px); }
+
+/* --------------------------------------------------------------------------
+   SLIDE 2: Neural Flow & Automation Pipeline
+   -------------------------------------------------------------------------- */
+.pipeline-flow-wrapper {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pipeline-step-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.pipeline-step-card.active {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.12);
+}
+
+.step-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+}
+
+.pipeline-step-card.active .step-icon-badge {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.step-meta {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.step-subtitle {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.step-metric {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.step-metric.badge-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+/* --------------------------------------------------------------------------
+   SLIDE 3: Multi-Agent Swarm Collaboration Mesh
+   -------------------------------------------------------------------------- */
+.swarm-mesh-wrapper {
+  position: relative;
+  width: 360px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swarm-radar-ring {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  border: 1px dashed #cbd5e1;
+  animation: radarRotate 20s linear infinite;
+}
+
+@keyframes radarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.agent-node {
+  position: absolute;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  animation: agentFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes agentFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.agent-dot-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   SLIDE 4: Real-Time Edge Telemetry & Latency
+   -------------------------------------------------------------------------- */
+.telemetry-wrapper {
+  width: 100%;
+  max-width: 360px;
+  background: #0f172a;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: #ffffff;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.telemetry-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.telemetry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.telemetry-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.telemetry-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.telemetry-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.telemetry-val {
+  font-size: 1.25rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+/* Waveform Canvas Simulation */
+.waveform-svg {
+  width: 100%;
+  height: 60px;
+  margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   Showcase Bottom Pagination & Controls
+   ========================================================================== */
+.showcase-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f2f4;
+  z-index: 2;
+}
+
+.slide-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slide-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #d1d5db;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slide-dot.active {
+  width: 22px;
+  border-radius: 9999px;
+  background-color: #111827;
+}
+
+.carousel-nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-arrow-nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-arrow-nav:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.carousel-pause-toggle {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.custom-toast {
+  background: #111827;
+  color: #ffffff;
+  padding: 0.85rem 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInToast {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 960px) {
+  .browser-window {
+    border-radius: 0.75rem;
+  }
+  
+  .auth-stage {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .auth-panel {
+    width: 100%;
+    padding: 2.5rem 1.5rem;
+  }
+  
+  /* Reset slide translation on mobile */
+  .auth-stage.mode-login .panel-form,
+  .auth-stage.mode-register .panel-form,
+  .auth-stage.mode-login .panel-showcase,
+  .auth-stage.mode-register .panel-showcase {
+    transform: none;
+    order: unset;
+  }
+  
+  /* Switch mobile ordering via flex column order */
+  .auth-stage.mode-login .panel-form { order: 1; }
+  .auth-stage.mode-login .panel-showcase { order: 2; }
+  
+  .auth-stage.mode-register .panel-form { order: 1; }
+  .auth-stage.mode-register .panel-showcase { order: 2; }
+
+  .constellation-wrapper {
+    width: 320px;
+    height: 300px;
+    transform: scale(0.85);
+  }
+}
