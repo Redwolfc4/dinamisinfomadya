@@ -27,13 +27,8 @@ public static class DbInitializer
             }
 
             logger.LogInformation("Menjalankan seeder data pengguna awal...");
-            
-            // Password default seeder yang diminta: dinamisinfomadya123#
-            const string defaultPassword = "dinamisinfomadya123#";
 
-            // Seed Admin (Sync) & Demo (Async)
-            UserSeeder.Seed(context, defaultPassword);
-            await UserSeeder.SeedAsync(context, defaultPassword, CancellationToken.None);
+            await UserSeeder.SeedAsync(context, CancellationToken.None);
 
             logger.LogInformation("Inisialisasi database dan seeder berhasil diselesaikan!");
         }

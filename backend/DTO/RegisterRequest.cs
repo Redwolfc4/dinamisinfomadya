@@ -17,5 +17,10 @@ public class RegisterRequest
     [RegularExpression(@"\A(?=.{8,128}\z)(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).+\z", MatchTimeoutInMilliseconds = 1000, ErrorMessage = "Password harus mengandung minimal 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 simbol.")]
     public string Password { get; set; } = string.Empty;
 
-
+    public void Deconstruct(out string fullName, out string username, out string password)
+    {
+        username = Username.Trim().ToLowerInvariant();
+        fullName = string.IsNullOrWhiteSpace(FullName) ? username : FullName.Trim();
+        password = Password;
+    }
 }

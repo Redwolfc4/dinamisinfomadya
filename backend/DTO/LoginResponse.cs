@@ -12,6 +12,8 @@ public class LoginResponse
 
     public int LoginFailedCount { get; set; }
 
+    public int MaxLoginAttempts { get; set; } = 3;
+
     public bool IsLocked { get; set; }
 }
 

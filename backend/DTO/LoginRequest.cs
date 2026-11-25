@@ -10,4 +10,9 @@ public class LoginRequest
     [Required(ErrorMessage = "Password wajib diisi.")]
     public string Password { get; set; } = string.Empty;
 
+    public void Deconstruct(out string username, out string password)
+    {
+        username = Username.Trim().ToLowerInvariant();
+        password = Password;
+    }
 }

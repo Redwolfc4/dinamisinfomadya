@@ -3,260 +3,19 @@
 
 <PageTitle>AI Labs — Select &amp; Combine &amp; Integrate</PageTitle>
 
-<div class="auth-page-root">
-    <!-- Main Auth Container Card -->
-    <div class="browser-window">
-        <!-- ===================================================================
-             MAIN SPLIT VIEW: Sliding Transition Between Left and Right
-             =================================================================== -->
-        <div class="auth-stage @(isRegisterMode ? "mode-register" : "mode-login")">
-            <!-- PANEL 1: Form Panel (Left in Login mode, Slides to Right in Register mode) -->
-            <div class="auth-panel panel-form">
-                @if (!isRegisterMode)
-                {
-                    <!-- =======================================================
-                         LOGIN FORM (Exact match to screenshot)
-                         ======================================================= -->
-                    <div class="form-content-wrap">
-                        <!-- App Logo (Squircle with smile face) -->
-                        <div class="brand-icon-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="5" />
-                                <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
-                                <circle cx="15.5" cy="10" r="1.5" fill="currentColor" />
-                                <path d="M8 15a4 4 0 0 0 8 0" stroke-width="2.2" />
-                            </svg>
-                        </div>
+<AuthSplitLayout IsRegisterMode="isRegisterMode">
+    @if (!isRegisterMode)
+    {
+        <LoginForm OnSwitchToRegister="() => SetMode(true)"
+                   OnNotify="HandleNotification" />
+    }
+    else
+    {
+        <RegisterForm OnSwitchToLogin="() => SetMode(false)"
+                      OnNotify="HandleNotification" />
+    }
+</AuthSplitLayout>
 
-                        <!-- Heading & Subtitle -->
-                        <h1 class="form-heading">Welcome to AI Labs</h1>
-                        <p class="form-subtext">Please enter your credentials to sign in.</p>
-
-                        <!-- Login Form Fields -->
-                        <form @onsubmit="HandleLoginSubmit">
-                            <!-- Email -->
-                            <div class="form-field-group">
-                                <label class="form-label" for="login-email">Email</label>
-                                <div class="input-container">
-                                    <input id="login-email" 
-                                           type="email" 
-                                           class="form-input" 
-                                           placeholder="grace@org.com" 
-                                           @bind="loginEmail" 
-                                           required />
-                                </div>
-                            </div>
-
-                            <!-- Password with Eye Toggle -->
-                            <div class="form-field-group">
-                                <label class="form-label" for="login-password">Password</label>
-                                <div class="input-container @(showErrorAlert ? "has-error" : "")">
-                                    <input id="login-password" 
-                                           type="@(showPassword ? "text" : "password")" 
-                                           class="form-input" 
-                                           placeholder="••••••••••••" 
-                                           @bind="loginPassword" 
-                                           required />
-                                    <button type="button" class="btn-eye-toggle" @onclick="() => showPassword = !showPassword" title="Toggle password visibility">
-                                        @if (showPassword)
-                                        {
-                                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                                        }
-                                        else
-                                        {
-                                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                        }
-                                    </button>
-                                </div>
-
-                                <!-- Error Alert Banner (matching screenshot) -->
-                                @if (showErrorAlert)
-                                {
-                                    <div class="form-error-alert">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <line x1="12" y1="8" x2="12" y2="12" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                                            <line x1="12" y1="16" x2="12.01" y2="16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-                                        </svg>
-                                        <span>Please enter the correct password</span>
-                                    </div>
-                                }
-                            </div>
-
-                            <!-- Options: Remember Me & Forgot Password -->
-                            <div class="form-options-row">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="custom-checkbox" @bind="rememberMe" />
-                                    <span>Remember me</span>
-                                </label>
-                                <a href="javascript:void(0)" class="link-forgot" @onclick="HandleForgotPassword">
-                                    Forgot password?
-                                </a>
-                            </div>
-
-                            <!-- Continue Button -->
-                            <button type="submit" class="btn-primary-action" disabled="@isSubmitting">
-                                @if (isSubmitting)
-                                {
-                                    <span style="display: inline-block; width: 14px; height: 14px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span>
-                                    <span>Signing In...</span>
-                                }
-                                else
-                                {
-                                    <span>Continue</span>
-                                }
-                            </button>
-                        </form>
-
-                        <!-- Trouble Signing In -->
-                        <div class="help-links-wrap">
-                            <a href="javascript:void(0)" class="link-help" @onclick="HandleTroubleSignIn">
-                                Have trouble signing in?
-                            </a>
-                        </div>
-
-                        <!-- Mode Switch Prompt -->
-                        <div class="switch-mode-prompt">
-                            <span>Don't have an account?</span>
-                            <button type="button" class="btn-switch-mode btn-to-register" @onclick="ToggleMode">Sign up</button>
-                        </div>
-
-                        <!-- Footer disclaimer -->
-                        <p class="form-footer-disclaimer">
-                            By continuing, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <!-- =======================================================
-                         REGISTER FORM (Clean, High-Converting Signup)
-                         ======================================================= -->
-                    <div class="form-content-wrap">
-                        <!-- App Logo -->
-                        <div class="brand-icon-box" style="background: #1e1b4b;">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="8.5" cy="7" r="4" />
-                                <line x1="20" y1="8" x2="20" y2="14" />
-                                <line x1="23" y1="11" x2="17" y2="11" />
-                            </svg>
-                        </div>
-
-                        <!-- Heading & Subtitle -->
-                        <h1 class="form-heading">Create your Account</h1>
-                        <p class="form-subtext">Join AI Labs to build, integrate, and deploy AI models.</p>
-
-                        <!-- Registration Form -->
-                        <form @onsubmit="HandleRegisterSubmit">
-                            <!-- Full Name & Username Side-by-Side -->
-                            <div class="form-row-2col">
-                                <div class="form-field-group">
-                                    <label class="form-label" for="reg-fullname">Full Name</label>
-                                    <input id="reg-fullname" 
-                                           type="text" 
-                                           class="form-input" 
-                                           placeholder="Grace Hopper" 
-                                           @bind="registerFullName" 
-                                           required />
-                                </div>
-
-                                <div class="form-field-group">
-                                    <label class="form-label" for="reg-username">Username</label>
-                                    <input id="reg-username" 
-                                           type="text" 
-                                           class="form-input" 
-                                           placeholder="grace_hopper" 
-                                           @bind="registerUsername" 
-                                           required />
-                                </div>
-                            </div>
-
-                            <!-- Work Email -->
-                            <div class="form-field-group">
-                                <label class="form-label" for="reg-email">Work Email</label>
-                                <input id="reg-email" 
-                                       type="email" 
-                                       class="form-input" 
-                                       placeholder="grace@org.com" 
-                                       @bind="registerEmail" 
-                                       required />
-                            </div>
-
-                            <!-- Password with strength meter -->
-                            <div class="form-field-group">
-                                <label class="form-label" for="reg-password">Password</label>
-                                <div class="input-container">
-                                    <input id="reg-password" 
-                                           type="@(showPassword ? "text" : "password")" 
-                                           class="form-input" 
-                                           placeholder="Create a strong password" 
-                                           @bind="registerPassword" 
-                                           @bind:event="oninput"
-                                           required />
-                                    <button type="button" class="btn-eye-toggle" @onclick="() => showPassword = !showPassword" title="Toggle password visibility">
-                                        @if (showPassword)
-                                        {
-                                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                                        }
-                                        else
-                                        {
-                                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                        }
-                                    </button>
-                                </div>
-
-                                <!-- Password Strength Indicator -->
-                                <div class="strength-meter">
-                                    <span class="strength-bar @(PasswordStrengthLevel >= 1 ? "active-weak" : "")"></span>
-                                    <span class="strength-bar @(PasswordStrengthLevel >= 2 ? "active-medium" : "")"></span>
-                                    <span class="strength-bar @(PasswordStrengthLevel >= 3 ? "active-strong" : "")"></span>
-                                </div>
-                                <span class="strength-text" style="color: @PasswordStrengthColor">
-                                    @PasswordStrengthLabel
-                                </span>
-                            </div>
-
-                            <!-- Terms Checkbox -->
-                            <div class="form-options-row" style="margin: 0.75rem 0 1.25rem 0;">
-                                <label class="checkbox-label" style="font-size: 0.78rem;">
-                                    <input type="checkbox" class="custom-checkbox" @bind="agreeTerms" required />
-                                    <span>I agree to the <a href="/terms" class="link-forgot">Terms</a> &amp; <a href="/privacy" class="link-forgot">Privacy Policy</a></span>
-                                </label>
-                            </div>
-
-                            <!-- Create Account Button -->
-                            <button type="submit" class="btn-primary-action" disabled="@(isSubmitting || !agreeTerms)">
-                                @if (isSubmitting)
-                                {
-                                    <span style="display: inline-block; width: 14px; height: 14px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span>
-                                    <span>Creating Account...</span>
-                                }
-                                else
-                                {
-                                    <span>Create Account</span>
-                                }
-                            </button>
-                        </form>
-
-                        <!-- Switch back to Login -->
-                        <div class="switch-mode-prompt">
-                            <span>Already have an account?</span>
-                            <button type="button" class="btn-switch-mode btn-to-login" @onclick="ToggleMode">Sign in</button>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <!-- PANEL 2: Graphic Showcase Panel (Right in Login mode, Slides to Left in Register mode) -->
-            <div class="auth-panel panel-showcase">
-                <AiShowcase />
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Dynamic Toast Notification Floating Alert -->
 @if (activeToast != null)
 {
     <div class="toast-container">
@@ -268,104 +27,23 @@
 }
 
 @code {
-    public enum ToastType { Info, Success, Warning, Error }
-    public record ToastMessage(ToastType Type, string Text);
+    public record ToastMessage(string Type, string Text);
 
     private bool isRegisterMode = false;
-    private bool showPassword = false;
-    private bool rememberMe = true;
-    private bool showErrorAlert = true; // Shown by default to match user's screenshot!
-    private bool isSubmitting = false;
-    private bool agreeTerms = true;
-
-    // Login fields
-    private string loginEmail = "grace@org.com";
-    private string loginPassword = "superSecretPassword123";
-
-    // Register fields
-    private string registerFullName = "";
-    private string registerUsername = "";
-    private string registerEmail = "";
-    private string registerPassword = "";
-
-    // Toast
     private ToastMessage? activeToast;
 
-    private int PasswordStrengthLevel
+    private void SetMode(bool registerMode)
     {
-        get
-        {
-            if (string.IsNullOrEmpty(registerPassword)) return 0;
-            int score = 0;
-            if (registerPassword.Length >= 6) score++;
-            if (registerPassword.Length >= 10 && registerPassword.Any(char.IsDigit)) score++;
-            if (registerPassword.Any(ch => !char.IsLetterOrDigit(ch))) score++;
-            return score;
-        }
-    }
-
-    private string PasswordStrengthLabel => PasswordStrengthLevel switch
-    {
-        1 => "Weak password",
-        2 => "Medium password strength",
-        3 => "Strong & secure password",
-        _ => "Enter at least 6 characters"
-    };
-
-    private string PasswordStrengthColor => PasswordStrengthLevel switch
-    {
-        1 => "#ef4444",
-        2 => "#f59e0b",
-        3 => "#10b981",
-        _ => "#9ca3af"
-    };
-
-    private void ToggleMode()
-    {
-        isRegisterMode = !isRegisterMode;
-        showErrorAlert = false;
+        isRegisterMode = registerMode;
         StateHasChanged();
     }
 
-    private void HandleForgotPassword() => ShowToastNotification(new ToastMessage(ToastType.Info, "Password reset link sent to your email!"));
-    private void HandleTroubleSignIn() => ShowToastNotification(new ToastMessage(ToastType.Info, "Help Center: Contact support@labs.ai"));
+    private void HandleNotification((string Type, string Message) notification)
+    {
+        ShowToastNotification(new ToastMessage(notification.Type, notification.Message));
+    }
+
     private void DismissToast() => activeToast = null;
-
-    private async Task HandleLoginSubmit()
-    {
-        isSubmitting = true;
-        StateHasChanged();
-
-        await Task.Delay(1000); // Realistic network delay
-        isSubmitting = false;
-
-        // If demo password matches screenshot error demo
-        if (loginPassword == "wrong" || (showErrorAlert && loginPassword != "superSecretPassword123"))
-        {
-            showErrorAlert = true;
-            ShowToastNotification(new ToastMessage(ToastType.Error, "Authentication failed: Please check your password."));
-        }
-        else
-        {
-            showErrorAlert = false;
-            ShowToastNotification(new ToastMessage(ToastType.Success, $"Welcome back to AI Labs, {loginEmail}!"));
-        }
-    }
-
-    private async Task HandleRegisterSubmit()
-    {
-        isSubmitting = true;
-        StateHasChanged();
-
-        await Task.Delay(1200);
-        isSubmitting = false;
-
-        ShowToastNotification(new ToastMessage(ToastType.Success, $"Account created for @{registerUsername}! Welcome aboard!"));
-        
-        // Auto transition back to login or dashboard
-        await Task.Delay(1500);
-        isRegisterMode = false;
-    }
 
     private void ShowToastNotification(ToastMessage msg)
     {
@@ -383,11 +61,11 @@
         });
     }
 
-    private string GetToastStyle(ToastType type) => type switch
+    private string GetToastStyle(string type) => type switch
     {
-        ToastType.Success => "background: #065f46; border-left: 4px solid #10b981;",
-        ToastType.Error => "background: #7f1d1d; border-left: 4px solid #ef4444;",
-        ToastType.Warning => "background: #78350f; border-left: 4px solid #f59e0b;",
+        "Success" => "background: #065f46; border-left: 4px solid #10b981;",
+        "Error" => "background: #7f1d1d; border-left: 4px solid #ef4444;",
+        "Warning" => "background: #78350f; border-left: 4px solid #f59e0b;",
         _ => "background: #0f172a; border-left: 4px solid #3b82f6;"
     };
 }

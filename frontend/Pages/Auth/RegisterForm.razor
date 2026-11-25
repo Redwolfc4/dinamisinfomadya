@@ -1,0 +1,240 @@
+@inject AuthApiService AuthApi
+
+<div class="form-content-wrap">
+    <!-- App Logo -->
+    <div class="brand-icon-box" style="background: #1e1b4b;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.2" stroke-linecap="round"
+             stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="8.5" cy="7" r="4" />
+            <line x1="20" y1="8" x2="20" y2="14" />
+            <line x1="23" y1="11" x2="17" y2="11" />
+        </svg>
+    </div>
+
+    <!-- Heading & Subtitle -->
+    <h1 class="form-heading">Create your Account</h1>
+    <p class="form-subtext">Join AI Labs to build, integrate, and deploy AI models.</p>
+
+    <!-- Registration Form -->
+    <form @onsubmit="HandleRegisterSubmit" novalidate>
+        <div class="form-row-2col">
+            <FormInput @ref="_firstNameInput" Id="reg-firstname" Label="First Name" Type="text" Placeholder="Grace"
+                       TabIndex="1" @bind-Value="registerFirstName" Required="true"
+                       HasError="@(!string.IsNullOrEmpty(firstNameError))" ErrorMessage="@firstNameError" />
+
+            <FormInput @ref="_lastNameInput" Id="reg-lastname" Label="Last Name" Type="text" Placeholder="Hopper"
+                       TabIndex="2" @bind-Value="registerLastName" Required="true"
+                       HasError="@(!string.IsNullOrEmpty(lastNameError))" ErrorMessage="@lastNameError" />
+        </div>
+
+        <FormInput @ref="_usernameInput" Id="reg-username" Label="Username" Type="text" Placeholder="grace_hopper"
+                   TabIndex="3" @bind-Value="registerUsername" Required="true"
+                   HasError="@(!string.IsNullOrEmpty(usernameError))" ErrorMessage="@usernameError" />
+
+        <FormInput @ref="_passwordInput" Id="reg-password" Label="Password" IsPassword="true"
+                   Placeholder="Create a strong password" TabIndex="4" @bind-Value="registerPassword" Required="true"
+                   HasError="@(!string.IsNullOrEmpty(passwordError))" ErrorMessage="@passwordError" />
+
+        <!-- Password Strength Meter -->
+        <div style="margin-top: -0.35rem; margin-bottom: 1rem;">
+            <div class="password-strength-meter">
+                <div class="strength-bar @(PasswordStrengthLevel >= 1 ? "active-weak" : "")"
+                     style="background: @(PasswordStrengthLevel >= 2 ? (PasswordStrengthLevel == 2 ? "#f59e0b" : "#10b981") : "")">
+                </div>
+                <div class="strength-bar @(PasswordStrengthLevel >= 2 ? "active-medium" : "")"
+                     style="background: @(PasswordStrengthLevel >= 3 ? "#10b981" : "")"></div>
+                <div class="strength-bar @(PasswordStrengthLevel >= 3 ? "active-strong" : "")"></div>
+            </div>
+            <span class="strength-text" style="color: @PasswordStrengthColor">@PasswordStrengthLabel</span>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="form-options-row" style="margin-bottom: 1.25rem;">
+            <label class="checkbox-label">
+                <input type="checkbox" class="custom-checkbox" tabindex="5" @bind="agreeTerms" required />
+                <span>I agree to the <a href="/terms" class="link-forgot" tabindex="8">Terms</a> &amp; <a
+                    href="/privacy" class="link-forgot" tabindex="9">Privacy Policy</a></span>
+                </label>
+            </div>
+
+            <PrimaryButton Type="submit" TabIndex="6" IsLoading="isSubmitting" Disabled="!agreeTerms"
+                           LoadingText="Creating Account...">
+                <span>Create Account</span>
+            </PrimaryButton>
+        </form>
+
+        <!-- Switch back to Login -->
+        <div class="switch-mode-prompt">
+            <span>Already have an account?</span>
+            <button type="button" class="btn-switch-mode btn-to-login" tabindex="7" @onclick="OnSwitchToLogin">Sign
+                in</button>
+            </div>
+        </div>
+
+@code {
+    [Parameter] public EventCallback OnSwitchToLogin { get; set; }
+    [Parameter] public EventCallback<(string Type, string Message)> OnNotify { get; set; }
+
+    private FormInput? _firstNameInput;
+    private FormInput? _lastNameInput;
+    private FormInput? _usernameInput;
+    private FormInput? _passwordInput;
+
+    private string registerFirstName = "";
+    private string registerLastName = "";
+    private string registerUsername = "";
+    private string registerPassword = "";
+    private string firstNameError = "";
+    private string lastNameError = "";
+    private string usernameError = "";
+    private string passwordError = "";
+    private bool agreeTerms = true;
+    private bool isSubmitting = false;
+
+    private int PasswordStrengthLevel
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(registerPassword)) return 0;
+            int score = 0;
+            if (registerPassword.Length >= 6) score++;
+            if (registerPassword.Length >= 10 && registerPassword.Any(char.IsDigit)) score++;
+            if (registerPassword.Any(ch => !char.IsLetterOrDigit(ch))) score++;
+            return score;
+        }
+    }
+
+    private string PasswordStrengthLabel => PasswordStrengthLevel switch
+    {
+        1 => "Weak password",
+        2 => "Medium password strength",
+        3 => "Strong & secure password",
+        _ => "Enter at least 6 characters"
+    };
+
+    private string PasswordStrengthColor => PasswordStrengthLevel switch
+    {
+        1 => "#ef4444",
+        2 => "#f59e0b",
+        3 => "#10b981",
+        _ => "#9ca3af"
+    };
+
+    private async Task HandleRegisterSubmit()
+    {
+        firstNameError = "";
+        lastNameError = "";
+        usernameError = "";
+        passwordError = "";
+
+        var firstName = registerFirstName.Trim();
+        var lastName = registerLastName.Trim();
+        var fullName = $"{firstName} {lastName}".Trim();
+        var username = registerUsername.Trim();
+
+        bool hasValidationError = false;
+
+        if (string.IsNullOrWhiteSpace(firstName))
+        {
+            firstNameError = "First Name wajib diisi.";
+            hasValidationError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(lastName))
+        {
+            lastNameError = "Last Name wajib diisi.";
+            hasValidationError = true;
+        }
+
+        if (!hasValidationError && (fullName.Length < 3 || fullName.Length > 100))
+        {
+            firstNameError = "Nama lengkap harus 3–100 karakter.";
+            hasValidationError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            usernameError = "Username wajib diisi.";
+            hasValidationError = true;
+        }
+        else if (username.Length < 3 || username.Length > 50)
+        {
+            usernameError = "Username harus 3–50 karakter.";
+            hasValidationError = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(registerPassword))
+        {
+            passwordError = "Password wajib diisi.";
+            hasValidationError = true;
+        }
+        else if (registerPassword.Length < 8 ||
+            !registerPassword.Any(char.IsLower) ||
+            !registerPassword.Any(char.IsUpper) ||
+            !registerPassword.Any(char.IsDigit) ||
+            !registerPassword.Any(ch => "!@#$%^&*".Contains(ch)))
+        {
+            passwordError = "Min. 8 karakter, ada huruf besar, kecil, angka & simbol (!@#$%^&*).";
+            hasValidationError = true;
+        }
+
+        if (hasValidationError)
+        {
+            if (!string.IsNullOrEmpty(firstNameError) && _firstNameInput is not null)
+            {
+                await _firstNameInput.FocusAsync();
+            }
+            else if (!string.IsNullOrEmpty(lastNameError) && _lastNameInput is not null)
+            {
+                await _lastNameInput.FocusAsync();
+            }
+            else if (!string.IsNullOrEmpty(usernameError) && _usernameInput is not null)
+            {
+                await _usernameInput.FocusAsync();
+            }
+            else if (!string.IsNullOrEmpty(passwordError) && _passwordInput is not null)
+            {
+                await _passwordInput.FocusAsync();
+            }
+            return;
+        }
+
+        isSubmitting = true;
+        StateHasChanged();
+
+        var response = await AuthApi.RegisterAsync(new RegisterRequestDto
+        {
+            FullName = fullName,
+            Username = username,
+            Password = registerPassword
+        });
+
+        isSubmitting = false;
+
+        if (!response.Success)
+        {
+            if (response.Message.Contains("Username", StringComparison.OrdinalIgnoreCase))
+            {
+                usernameError = response.Message;
+                if (_usernameInput is not null)
+                {
+                    await _usernameInput.FocusAsync();
+                }
+            }
+            await OnNotify.InvokeAsync(("Error", response.Message));
+            return;
+        }
+
+        await OnNotify.InvokeAsync(("Success", response.Message));
+
+        registerFirstName = "";
+        registerLastName = "";
+        registerUsername = "";
+        registerPassword = "";
+
+        await Task.Delay(1200);
+        await OnSwitchToLogin.InvokeAsync();
+    }
+}
+

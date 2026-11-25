@@ -68,9 +68,21 @@ if (!string.IsNullOrWhiteSpace(rawConnectionString))
 // ==============================================================================
 // 3. DEPENDENCY INJECTION CONTAINER
 // ==============================================================================
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<RegisterService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:5181", "https://localhost:7180")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Jwt:Key belum dikonfigurasi di User Secrets atau environment.");
@@ -84,8 +96,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = AuthService.Issuer,
-            ValidAudience = AuthService.Audience,
+            ValidIssuer = UserService.Issuer,
+            ValidAudience = UserService.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
@@ -121,6 +133,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

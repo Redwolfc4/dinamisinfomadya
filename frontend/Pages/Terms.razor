@@ -1,160 +1,83 @@
 @page "/terms"
 @layout AuthLayout
-@inject NavigationManager Navigation
 
 <PageTitle>Terms of Service — AI Labs</PageTitle>
 
-<div class="auth-page-root">
-    <div class="browser-window">
-        <!-- Browser Top Bar -->
-        <div class="browser-header">
-            <!-- macOS Traffic Light Buttons -->
-            <div class="traffic-lights">
-                <span class="traffic-dot close" title="Back to Home" @onclick='() => Navigation.NavigateTo("/")'></span>
-                <span class="traffic-dot minimize" title="Minimize"></span>
-                <span class="traffic-dot maximize" title="Fullscreen"></span>
-            </div>
+<div class="legal-doc-page">
+    <h1 class="legal-doc-h1">Terms of Service</h1>
+    <p class="legal-doc-meta">Last modified: November 25, 2026</p>
+    <p class="legal-doc-meta">Effective Date: November 25, 2026</p>
 
-            <!-- Browser Navigation Buttons -->
-            <div class="browser-nav-actions">
-                <a href="/" class="browser-nav-btn" title="Back to Sign In">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-                </a>
-                <button type="button" class="browser-nav-btn" disabled title="Forward">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                </button>
-            </div>
+    <h2 class="legal-doc-h2">Summary of Changes</h2>
+    <p class="legal-doc-p">
+        We have revised these Terms. This summary is intended to briefly explain the changes made and help you
+        understand how these changes may affect you. We encourage you to review the modified Terms of Service in full to
+        understand the terms that will govern your use of our Services (as defined below). We have made changes:
+    </p>
+    <ul class="legal-doc-ul">
+        <li>to clarify language concerning your access to and use of the Services; and</li>
+        <li>to streamline and improve the legibility of the Terms and <a href="/privacy" class="legal-doc-link">Privacy
+            Policy</a>; and</li>
+            <li>to update the scope of AI model usage and data ownership policies.</li>
+        </ul>
 
-            <!-- Address Bar -->
-            <div class="address-bar-wrapper">
-                <div class="address-bar">
-                    <svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    <span>labs.ai/terms</span>
-                </div>
-            </div>
+        <hr class="legal-doc-hr" />
 
-            <!-- Right Actions -->
-            <div class="browser-right-actions">
-                <a href="/" class="browser-nav-btn" title="Close and return">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </a>
-            </div>
-        </div>
+        <section class="legal-doc-section">
+            <h3 class="legal-doc-h3">1. Introduction</h3>
+            <p class="legal-doc-p">
+                Welcome to AI Labs! AI Labs (<strong>"we," "us,"</strong> or <strong>"our"</strong>) is an AI development
+                platform that lets its customers select, combine, and integrate AI models and workflows.
+            </p>
+            <p class="legal-doc-p">
+                The following terms and conditions (<strong>"Terms"</strong>) govern your use of AI Labs's products,
+                services, software, platform, and APIs (the <strong>"Website"</strong>) whether as a guest or a registered
+                account user (<strong>"User"</strong> or <strong>"Customer"</strong>), including, without limitation, (i)
+                creating and managing workspaces; (ii) connecting and orchestrating AI models; and (iii) accessing and
+                interacting with generated outputs. If any new features are added to the Services in the future, such
+                features will also be subject to these Terms (with the Website collectively, the
+                <strong>"Services"</strong>).
+            </p>
+        </section>
 
-        <!-- Document Body -->
-        <div class="legal-wrapper">
-            <!-- Header Hero -->
-            <header class="legal-header-hero">
-                <div class="legal-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Legal &amp; Compliance
-                </div>
-                <h1 class="legal-title">Terms of Service</h1>
-                <p class="legal-subtitle">Please read these Terms of Service carefully before utilizing the AI Labs platform, models, and orchestration APIs.</p>
+        <section class="legal-doc-section">
+            <h3 class="legal-doc-h3">2. Account Registration &amp; Security</h3>
+            <p class="legal-doc-p">
+                When creating an account on AI Labs, you must provide accurate, current, and complete information. You are
+                solely responsible for safeguarding your authentication credentials, including your password and API keys.
+                You agree not to share your account access credentials with unauthorized third parties and to notify us
+                immediately of any unauthorized use or security breach.
+            </p>
+        </section>
 
-                <!-- Navigation Tabs -->
-                <div class="legal-nav-tabs">
-                    <a href="/terms" class="legal-tab-link active">Terms of Service</a>
-                    <a href="/privacy" class="legal-tab-link">Privacy Policy</a>
-                </div>
-            </header>
+        <section class="legal-doc-section">
+            <h3 class="legal-doc-h3">3. Acceptable Use of AI Models &amp; APIs</h3>
+            <p class="legal-doc-p">
+                You agree to use our platform strictly in compliance with all applicable local, national, and international
+                laws. You may not use AI Labs to generate, train, or distribute malicious code, deceptive impersonation
+                models, harassment tools, or content that violates fundamental safety standards.
+            </p>
+        </section>
 
-            <!-- Document Content -->
-            <article class="legal-content-body">
-                <div class="legal-meta-box">
-                    <div class="legal-meta-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span>Last Updated: November 24, 2026</span>
-                    </div>
-                    <div class="legal-meta-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                        <span>Version 2.4.0 (Enterprise)</span>
-                    </div>
-                </div>
+        <section class="legal-doc-section">
+            <h3 class="legal-doc-h3">4. Intellectual Property &amp; Code Ownership</h3>
+            <p class="legal-doc-p">
+                You retain full ownership and intellectual property rights over all prompts, datasets, source code, and
+                artifacts submitted to or generated through your private workspace. All visual interfaces, orchestration
+                engines, logos, and documentation remain the exclusive property of AI Labs and its licensors.
+            </p>
+        </section>
 
-                <section class="legal-section">
-                    <h2 class="legal-section-title">
-                        <span class="legal-section-num">01</span>
-                        Acceptance of Terms
-                    </h2>
-                    <p class="legal-section-text">
-                        By accessing or using the services, interfaces, or APIs provided by AI Labs ("we", "us", or "our"), you agree to be bound by these Terms of Service. If you are entering into this agreement on behalf of a company, organization, or other legal entity, you represent that you have the authority to bind such entity to these terms.
-                    </p>
-                    <p class="legal-section-text">
-                        If you do not agree to all terms and conditions set forth herein, you must immediately cease all access and use of our platform.
-                    </p>
-                </section>
+        <section class="legal-doc-section">
+            <h3 class="legal-doc-h3">5. Limitation of Liability &amp; Disclaimers</h3>
+            <p class="legal-doc-p">
+                AI Labs provides its services on an "as is" and "as available" basis. We make no warranties that model
+                outputs will always be error-free or suitable for critical automated decision systems without human
+                supervision.
+            </p>
+        </section>
 
-                <section class="legal-section">
-                    <h2 class="legal-section-title">
-                        <span class="legal-section-num">02</span>
-                        Account Registration &amp; Security
-                    </h2>
-                    <p class="legal-section-text">
-                        When creating an account on AI Labs, you must provide accurate, current, and complete information. You are solely responsible for safeguarding your authentication credentials, including your password, API keys, and two-factor recovery tokens.
-                    </p>
-                    <ul class="legal-section-list">
-                        <li>You must not share your account access credentials with unauthorized third parties.</li>
-                        <li>You agree to immediately notify AI Labs of any unauthorized use or security breach.</li>
-                        <li>Accounts registered by automated methods ("bots") without explicit API licensing are strictly prohibited.</li>
-                    </ul>
-                </section>
-
-                <section class="legal-section">
-                    <h2 class="legal-section-title">
-                        <span class="legal-section-num">03</span>
-                        Acceptable Use of AI Models &amp; APIs
-                    </h2>
-                    <p class="legal-section-text">
-                        Our platform provides advanced AI model selection, pipeline combination, and automated integration tooling. You agree to use these technologies strictly in compliance with all applicable local, national, and international laws.
-                    </p>
-                    <div class="legal-callout-card info">
-                        <div class="legal-callout-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        </div>
-                        <div class="legal-callout-body">
-                            <h4>Prohibited Generation Activities</h4>
-                            <p>You may not use AI Labs to generate, train, or distribute malicious code, deceptive impersonation models, harassment tools, or content that violates fundamental human safety standards.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="legal-section">
-                    <h2 class="legal-section-title">
-                        <span class="legal-section-num">04</span>
-                        Intellectual Property &amp; Code Ownership
-                    </h2>
-                    <p class="legal-section-text">
-                        <strong>Your Inputs &amp; Outputs:</strong> You retain full ownership and intellectual property rights over all prompts, training datasets, source code, and artifacts submitted to or generated through your private workspace.
-                    </p>
-                    <p class="legal-section-text">
-                        <strong>AI Labs Platform:</strong> All visual interfaces, system architectures, orchestration engines, logos, and documentation remain the exclusive property of AI Labs and its licensors.
-                    </p>
-                </section>
-
-                <section class="legal-section">
-                    <h2 class="legal-section-title">
-                        <span class="legal-section-num">05</span>
-                        Limitation of Liability &amp; Disclaimers
-                    </h2>
-                    <p class="legal-section-text">
-                        AI Labs provides its computational models and services on an "as is" and "as available" basis. While we strive for 99.9% uptime and zero inference hallucination, we make no warranties that model outputs will always be error-free or suitable for critical automated decision systems without human supervision.
-                    </p>
-                </section>
-
-                <footer class="legal-footer-nav">
-                    <a href="/" class="btn-legal-back">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-                        Back to Sign In
-                    </a>
-                    <div class="legal-contact-text">
-                        Questions about our terms? <a href="mailto:legal@labs.ai">Contact legal@labs.ai</a>
-                    </div>
-                </footer>
-            </article>
+        <div class="legal-doc-footer">
+            <a href="/" class="legal-doc-link">&larr; Back to Sign In</a>
         </div>
     </div>
-</div>

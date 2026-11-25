@@ -10,11 +10,18 @@ namespace backend.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly AuthService _authService;
+    private readonly UserService _userService;
+    private readonly LoginService _loginService;
+    private readonly RegisterService _registerService;
 
-    public AuthController(AuthService authService)
+    public AuthController(
+        UserService userService,
+        LoginService loginService,
+        RegisterService registerService)
     {
-        _authService = authService;
+        _userService = userService;
+        _loginService = loginService;
+        _registerService = registerService;
     }
 
     /// <summary>
@@ -23,7 +30,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest request)
     {
-        var result = await _authService.RegisterAsync(request);
+        var result = await _registerService.RegisterAsync(request);
         if (!result.Success)
         {
             return BadRequest(result);
@@ -38,7 +45,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
-        var result = await _authService.LoginAsync(request);
+        var result = await _loginService.LoginAsync(request);
         if (result.IsLocked)
         {
             return StatusCode(StatusCodes.Status423Locked, result);
@@ -65,7 +72,7 @@ public class AuthController : ControllerBase
             return Unauthorized(new { Success = false, Message = "Token tidak valid." });
         }
 
-        var user = await _authService.GetCurrentUserAsync(userId);
+        var user = await _userService.GetCurrentUserAsync(userId);
         if (user == null)
         {
             return NotFound(new { Success = false, Message = "Pengguna tidak ditemukan." });

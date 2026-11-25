@@ -1,0 +1,21 @@
+<div class="auth-page-root">
+    <div class="browser-window">
+        <div class="auth-stage @(IsRegisterMode ? "mode-register" : "mode-login")">
+            <!-- PANEL 1: Form Panel -->
+            <div class="auth-panel panel-form">
+                @ChildContent
+            </div>
+
+            <!-- PANEL 2: Graphic Showcase Panel -->
+            <div class="auth-panel panel-showcase">
+                <AiShowcase />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsRegisterMode { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}
+
