@@ -2,7 +2,7 @@
 
 @if (_toasts.Count > 0)
 {
-    <div class="fixed bottom-5 right-5 z-[9999] max-w-sm w-full px-4 group">
+    <div class="fixed bottom-5 right-4 sm:right-5 z-[9999] max-w-[calc(100vw-2rem)] sm:max-w-sm w-full max-h-[75vh] overflow-y-auto px-1 group">
         <div class="relative flex flex-col-reverse gap-2.5">
             @for (int i = 0; i < _toasts.Count; i++)
             {

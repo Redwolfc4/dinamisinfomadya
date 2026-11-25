@@ -3,8 +3,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
 
-public static class DbInitializer
+public static partial class DbInitializer
 {
+    [LoggerMessage(Level = LogLevel.Information, Message = "Memeriksa dan menerapkan migrasi database...")]
+    private static partial void LogCheckingMigrations(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Menjalankan seeder data pengguna awal...")]
+    private static partial void LogSeedingUsers(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Inisialisasi database dan seeder berhasil diselesaikan!")]
+    private static partial void LogInitSuccess(ILogger logger);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Terjadi kesalahan saat melakukan migrasi atau seeding database.")]
+    private static partial void LogInitError(ILogger logger, Exception ex);
+
     /// <summary>
     /// Menjalankan migrasi database otomatis dan proses seeding akun awal.
     /// </summary>
@@ -22,19 +34,19 @@ public static class DbInitializer
             // Menerapkan pending migrations jika koneksi database tersedia
             if (context.Database.IsRelational())
             {
-                logger.LogInformation("Memeriksa dan menerapkan migrasi database...");
+                LogCheckingMigrations(logger);
                 await context.Database.MigrateAsync();
             }
 
-            logger.LogInformation("Menjalankan seeder data pengguna awal...");
+            LogSeedingUsers(logger);
 
             await UserSeeder.SeedAsync(context, CancellationToken.None);
 
-            logger.LogInformation("Inisialisasi database dan seeder berhasil diselesaikan!");
+            LogInitSuccess(logger);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Terjadi kesalahan saat melakukan migrasi atau seeding database.");
+            LogInitError(logger, ex);
             throw;
         }
     }

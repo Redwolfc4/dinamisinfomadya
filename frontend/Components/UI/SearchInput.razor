@@ -1,0 +1,71 @@
+@implements IDisposable
+
+<div class="relative w-full @ContainerClass">
+    <input type="text"
+           class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+           placeholder="@Placeholder"
+           value="@Value"
+           @oninput="HandleInputAsync" />
+    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+
+    @if (!string.IsNullOrEmpty(Value))
+    {
+        <button type="button"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+                @onclick="ClearAsync"
+                title="Bersihkan pencarian">
+            ✕
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string> OnDebouncedSearch { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Cari...";
+    [Parameter] public int DebounceMs { get; set; } = 350;
+    [Parameter] public string ContainerClass { get; set; } = "sm:w-72";
+
+    private CancellationTokenSource? _cts;
+
+    private async Task HandleInputAsync(ChangeEventArgs e)
+    {
+        var query = e.Value?.ToString() ?? string.Empty;
+        Value = query;
+        await ValueChanged.InvokeAsync(query);
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        var token = _cts.Token;
+
+        try
+        {
+            await Task.Delay(DebounceMs, token);
+            await OnDebouncedSearch.InvokeAsync(query);
+        }
+        catch (TaskCanceledException)
+        {
+            // Abaikan jika user masih mengetik
+        }
+    }
+
+    private async Task ClearAsync()
+    {
+        _cts?.Cancel();
+        Value = string.Empty;
+        await ValueChanged.InvokeAsync(string.Empty);
+        await OnDebouncedSearch.InvokeAsync(string.Empty);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}
+

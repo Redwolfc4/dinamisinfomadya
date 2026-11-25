@@ -10,6 +10,11 @@ namespace frontend.Services;
 
 public class AuthHttpMessageHandler : DelegatingHandler
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly IJSRuntime _js;
     private readonly NavigationManager _navigation;
 
@@ -80,7 +85,7 @@ public class AuthHttpMessageHandler : DelegatingHandler
             if (!refreshResp.IsSuccessStatusCode) return null;
 
             var body = await refreshResp.Content.ReadAsStringAsync(cancellationToken);
-            var dto = JsonSerializer.Deserialize<LoginResponseDto>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var dto = JsonSerializer.Deserialize<LoginResponseDto>(body, JsonOptions);
             return dto?.Success == true ? dto.Token : null;
         }
         catch

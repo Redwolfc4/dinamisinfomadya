@@ -1,3 +1,4 @@
+@using System.Globalization
 @inject IJSRuntime JS
 
 <div class="relative inline-block text-left">
@@ -15,9 +16,9 @@
 
     @if (_isOpen)
     {
-        <div class="fixed inset-0 z-40" @onclick="CloseMenu"></div>
-        <div class="fixed w-36 rounded-xl bg-white shadow-lg border border-slate-200/80 py-1.5 z-50 text-left"
-             style="top: @(_topPx)px; right: @(_rightPx)px;"
+        <div class="fixed inset-0 z-[998]" @onclick="CloseMenu"></div>
+        <div class="fixed w-36 rounded-xl bg-white shadow-lg border border-slate-200/80 py-1.5 z-[999] text-left"
+             style="top: @(_topPx.ToString("0", CultureInfo.InvariantCulture))px; right: @(_rightPx.ToString("0", CultureInfo.InvariantCulture))px;"
              @onclick="CloseMenu">
             @ChildContent
         </div>
@@ -41,10 +42,11 @@
         }
 
         var rect = await JS.InvokeAsync<ElementRect>("getElementRect", _triggerRef);
-        _rightPx = Math.Max(8, rect.InnerWidth - rect.Right);
+        var maxRight = Math.Max(12, rect.InnerWidth - 160);
+        _rightPx = Math.Clamp(Math.Round(rect.InnerWidth - rect.Right), 12, maxRight);
         _topPx = (rect.Bottom + 140 > rect.InnerHeight)
-            ? Math.Max(8, rect.Top - 125)
-            : rect.Bottom + 6;
+            ? Math.Max(8, Math.Round(rect.Top - 125))
+            : Math.Round(rect.Bottom + 6);
 
         _isOpen = true;
     }

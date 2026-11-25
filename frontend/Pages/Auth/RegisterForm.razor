@@ -49,13 +49,13 @@
             <span class="strength-text" style="color: @PasswordStrengthColor">@PasswordStrengthLabel</span>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 0.75rem; font-size: 0.75rem; margin-top: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasMinLength ? "#10b981" : "#9ca3af");">
-                    <span>@(HasMinLength ? "✓" : "○")</span>
-                    <span>Min. 8 karakter</span>
-                </div>
                 <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasUpper ? "#10b981" : "#9ca3af");">
                     <span>@(HasUpper ? "✓" : "○")</span>
                     <span>Huruf besar (A-Z)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasMinLength ? "#10b981" : "#9ca3af");">
+                    <span>@(HasMinLength ? "✓" : "○")</span>
+                    <span>Min. 8 karakter</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasLower ? "#10b981" : "#9ca3af");">
                     <span>@(HasLower ? "✓" : "○")</span>

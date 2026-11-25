@@ -70,7 +70,7 @@ public class LoginService
             return new LoginResponse
             {
                 Success = false,
-                Message = "Username atau password salah.",
+                Message = "Password salah.",
                 LoginFailedCount = user.LoginFailed,
                 MaxLoginAttempts = MaxLoginAttempts,
                 IsLocked = false

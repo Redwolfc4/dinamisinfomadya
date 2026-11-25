@@ -62,7 +62,7 @@ public class UserApiService
         }
     }
 
-    private class PagedUsersApiResult
+    private sealed class PagedUsersApiResult
     {
         public bool Success { get; set; }
         public List<UserDto>? Data { get; set; }

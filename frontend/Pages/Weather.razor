@@ -24,18 +24,9 @@
             <span>entries</span>
         </div>
 
-        <div class="relative w-full sm:w-72">
-            <input type="text"
-                   class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                   placeholder="Cari semua kolom..."
-                   @bind="searchQuery"
-                   @bind:event="oninput"
-                   @bind:after="ResetToFirstPage" />
-            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-        </div>
+        <SearchInput Placeholder="Cari semua kolom..."
+                     Value="@searchQuery"
+                     OnDebouncedSearch="HandleDebouncedSearch" />
     </div>
 
     <div class="flex-1 flex flex-col">
@@ -97,6 +88,12 @@
     private string searchQuery = string.Empty;
     private int pageSize = 10;
     private int currentPage = 1;
+
+    private void HandleDebouncedSearch(string query)
+    {
+        searchQuery = query;
+        currentPage = 1;
+    }
 
     private List<WeatherForecast> FilteredForecasts => forecasts == null
         ? []

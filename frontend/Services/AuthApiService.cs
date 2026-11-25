@@ -7,6 +7,11 @@ namespace frontend.Services;
 
 public class AuthApiService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly HttpClient _http;
 
     public AuthApiService(HttpClient http)
@@ -25,7 +30,7 @@ public class AuthApiService
             {
                 var result = JsonSerializer.Deserialize<LoginResponseDto>(
                     rawContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    JsonOptions
                 );
                 if (result != null) return result;
             }
@@ -57,7 +62,7 @@ public class AuthApiService
             {
                 var result = JsonSerializer.Deserialize<RegisterResponseDto>(
                     rawContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    JsonOptions
                 );
                 return result ?? new RegisterResponseDto { Success = true, Message = "Registrasi berhasil." };
             }

@@ -48,10 +48,13 @@ public class UserService
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim().ToLowerInvariant();
+            var pattern = $"%{term}%";
+            var hasFailedCount = int.TryParse(term, out var failedCount);
+
             query = query.Where(u =>
-                u.FullName.ToLower().Contains(term) ||
-                u.Username.ToLower().Contains(term) ||
-                u.LoginFailed.ToString().Contains(term) ||
+                EF.Functions.ILike(u.FullName, pattern) ||
+                EF.Functions.ILike(u.Username, pattern) ||
+                (hasFailedCount && u.LoginFailed == failedCount) ||
                 (u.IsLocked && ("terkunci".Contains(term) || "locked".Contains(term))) ||
                 (!u.IsLocked && "aktif".Contains(term)));
         }

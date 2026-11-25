@@ -11,7 +11,7 @@
             <NavMenu OnLogoutClick="OpenLogoutModal" />
         </div>
 
-        <main class="min-w-0">
+        <main class="min-w-0 flex-1 overflow-y-auto">
             <div class="top-row px-4">
                 <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
             </div>
@@ -24,8 +24,7 @@
 
     <BaseModal IsOpen="showLogoutModal"
                Title="Konfirmasi Logout"
-               Subtitle="Sesi Anda saat ini akan diakhiri."
-               MaxWidthClass="max-w-sm"
+               MaxWidthClass="max-w-md"
                OnClose="CloseLogoutModal">
         <p class="text-sm text-slate-600 mb-6">
             Apakah Anda yakin ingin keluar dari aplikasi?
