@@ -47,6 +47,29 @@
                 <div class="strength-bar @(PasswordStrengthLevel >= 3 ? "active-strong" : "")"></div>
             </div>
             <span class="strength-text" style="color: @PasswordStrengthColor">@PasswordStrengthLabel</span>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 0.75rem; font-size: 0.75rem; margin-top: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasMinLength ? "#10b981" : "#9ca3af");">
+                    <span>@(HasMinLength ? "✓" : "○")</span>
+                    <span>Min. 8 karakter</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasUpper ? "#10b981" : "#9ca3af");">
+                    <span>@(HasUpper ? "✓" : "○")</span>
+                    <span>Huruf besar (A-Z)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasLower ? "#10b981" : "#9ca3af");">
+                    <span>@(HasLower ? "✓" : "○")</span>
+                    <span>Huruf kecil (a-z)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasDigit ? "#10b981" : "#9ca3af");">
+                    <span>@(HasDigit ? "✓" : "○")</span>
+                    <span>Angka (0-9)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: @(HasSymbol ? "#10b981" : "#9ca3af"); grid-column: span 2;">
+                    <span>@(HasSymbol ? "✓" : "○")</span>
+                    <span>Simbol (!&#64;#$%^&amp;*)</span>
+                </div>
+            </div>
         </div>
 
         <!-- Terms Checkbox -->
@@ -92,16 +115,21 @@
     private bool agreeTerms = true;
     private bool isSubmitting = false;
 
+    private bool HasMinLength => registerPassword.Length >= 8;
+    private bool HasUpper => registerPassword.Any(char.IsUpper);
+    private bool HasLower => registerPassword.Any(char.IsLower);
+    private bool HasDigit => registerPassword.Any(char.IsDigit);
+    private bool HasSymbol => registerPassword.Any(ch => "!@#$%^&*".Contains(ch));
+
     private int PasswordStrengthLevel
     {
         get
         {
             if (string.IsNullOrEmpty(registerPassword)) return 0;
-            int score = 0;
-            if (registerPassword.Length >= 6) score++;
-            if (registerPassword.Length >= 10 && registerPassword.Any(char.IsDigit)) score++;
-            if (registerPassword.Any(ch => !char.IsLetterOrDigit(ch))) score++;
-            return score;
+            int met = (HasMinLength ? 1 : 0) + (HasUpper ? 1 : 0) + (HasLower ? 1 : 0) + (HasDigit ? 1 : 0) + (HasSymbol ? 1 : 0);
+            if (met <= 2) return 1;
+            if (met <= 4) return 2;
+            return 3;
         }
     }
 
@@ -110,7 +138,7 @@
         1 => "Weak password",
         2 => "Medium password strength",
         3 => "Strong & secure password",
-        _ => "Enter at least 6 characters"
+        _ => "Enter at least 8 characters"
     };
 
     private string PasswordStrengthColor => PasswordStrengthLevel switch
