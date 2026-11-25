@@ -1,6 +1,46 @@
 @backend_HostAddress = http://localhost:5266
+@token = {{loginAdmin.response.body.token}}
 
-GET {{backend_HostAddress}}/weatherforecast/
+### 1. Register User Baru
+POST {{backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Sora Kasugano",
+  "username": "sorachan",
+  "password": "Password123!"
+}
+
+### 2. Login dengan User Baru
+# @name loginNewUser
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "sorachan",
+  "password": "Password123!"
+}
+
+### 3. Login Admin (Seeded User)
+# @name loginAdmin
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "dinamisinfomadya123#"
+}
+
+### 4. Get Current User (/api/auth/me) menggunakan JWT Token
+GET {{backend_HostAddress}}/api/auth/me
+Authorization: Bearer {{token}}
 Accept: application/json
 
-###
+### 5. Login Gagal (Simulasi Password Salah / Lock Screen Test)
+POST {{backend_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrongpassword123"
+}

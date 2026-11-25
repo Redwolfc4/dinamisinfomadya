@@ -1,6 +1,10 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using backend.Data;
+using backend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,10 +38,15 @@ void LoadEnvFile(string fileName)
     }
 }
 
-// Muat .env default terlebih dahulu
-LoadEnvFile(".env");
-// Muat dan override dengan .env.development jika berada di lingkungan Development
-LoadEnvFile($".env.{builder.Environment.EnvironmentName.ToLower()}");
+if (builder.Environment.IsDevelopment())
+{
+    LoadEnvFile(".env.development");
+}
+else
+{
+    LoadEnvFile(".env");
+    LoadEnvFile(".env.production");
+}
 
 // ==============================================================================
 // 2. RESOLVE ENVIRONMENT TOKENS (${KEY}) PADA KONFIGURASI
@@ -45,7 +54,6 @@ LoadEnvFile($".env.{builder.Environment.EnvironmentName.ToLower()}");
 var rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (!string.IsNullOrWhiteSpace(rawConnectionString))
 {
-    // Mengganti token seperti ${DATABASE_URL} atau ${DB_HOST} dengan nilai dari .env
     var resolved = Regex.Replace(
         rawConnectionString,
         @"\$\{([A-Za-z0-9_]+)\}",
@@ -54,17 +62,34 @@ if (!string.IsNullOrWhiteSpace(rawConnectionString))
                  ?? match.Value
     );
 
-    // Update nilai hasil injeksi kembali ke builder.Configuration
     builder.Configuration["ConnectionStrings:DefaultConnection"] = resolved;
 }
 
 // ==============================================================================
 // 3. DEPENDENCY INJECTION CONTAINER
 // ==============================================================================
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Dapatkan Connection String yang telah diinjeksi dan di-resolve
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("Jwt:Key belum dikonfigurasi di User Secrets atau environment.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = AuthService.Issuer,
+            ValidAudience = AuthService.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString) || connectionString.Contains("${"))
@@ -73,7 +98,6 @@ if (string.IsNullOrWhiteSpace(connectionString) || connectionString.Contains("${
         "Connection string 'DefaultConnection' belum terkonfigurasi dengan benar. Pastikan file .env atau .env.development sudah memuat variabel yang dibutuhkan.");
 }
 
-// Daftarkan AppDbContext dengan provider PostgreSQL (Npgsql)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -82,7 +106,6 @@ var app = builder.Build();
 // ==============================================================================
 // 4. CLI SEEDER EXECUTION
 // ==============================================================================
-// Jika dijalankan dengan parameter '--seed', eksekusi migrasi & seeder lalu selesai
 if (args.Contains("--seed"))
 {
     await app.InitializeDatabaseAsync();
@@ -98,6 +121,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
