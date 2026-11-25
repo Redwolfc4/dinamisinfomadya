@@ -1,18 +1,23 @@
+@inject IJSRuntime JS
+
 <div class="relative inline-block text-left">
-    <button type="button"
+    <button @ref="_triggerRef"
+            type="button"
             class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition cursor-pointer"
-            @onclick="ToggleMenu" @onclick:stopPropagation="true" aria-label="Opsi lainnya" title="Opsi">
+            @onclick="ToggleMenuAsync"
+            @onclick:stopPropagation="true"
+            aria-label="Opsi lainnya"
+            title="Opsi">
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <circle cx="4" cy="10" r="1.75" />
-            <circle cx="10" cy="10" r="1.75" />
-            <circle cx="16" cy="10" r="1.75" />
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
         </svg>
     </button>
 
     @if (_isOpen)
     {
         <div class="fixed inset-0 z-40" @onclick="CloseMenu"></div>
-        <div class="absolute right-0 mt-1.5 w-36 rounded-xl bg-white shadow-lg border border-slate-200/80 py-1.5 z-[999] text-left"
+        <div class="fixed w-36 rounded-xl bg-white shadow-lg border border-slate-200/80 py-1.5 z-50 text-left"
+             style="top: @(_topPx)px; right: @(_rightPx)px;"
              @onclick="CloseMenu">
             @ChildContent
         </div>
@@ -22,9 +27,37 @@
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
+    private ElementReference _triggerRef;
     private bool _isOpen = false;
+    private double _topPx = 0;
+    private double _rightPx = 0;
 
-    private void ToggleMenu() => _isOpen = !_isOpen;
+    private async Task ToggleMenuAsync()
+    {
+        if (_isOpen)
+        {
+            _isOpen = false;
+            return;
+        }
+
+        var rect = await JS.InvokeAsync<ElementRect>("getElementRect", _triggerRef);
+        _rightPx = Math.Max(8, rect.InnerWidth - rect.Right);
+        _topPx = (rect.Bottom + 140 > rect.InnerHeight)
+            ? Math.Max(8, rect.Top - 125)
+            : rect.Bottom + 6;
+
+        _isOpen = true;
+    }
+
     private void CloseMenu() => _isOpen = false;
-}
 
+    private class ElementRect
+    {
+        public double Top { get; set; }
+        public double Bottom { get; set; }
+        public double Left { get; set; }
+        public double Right { get; set; }
+        public double InnerWidth { get; set; }
+        public double InnerHeight { get; set; }
+    }
+}

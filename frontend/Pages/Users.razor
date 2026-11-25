@@ -5,7 +5,7 @@
 
 <PageTitle>Manajemen User</PageTitle>
 
-<div class="min-h-[calc(100vh-5.5rem)] flex flex-col">
+<div class="min-h-[calc(100vh-5.5rem)] flex flex-col min-w-0 w-full">
     <div class="mb-4">
         <h1 class="text-2xl font-bold text-slate-900">Manajemen User</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola informasi pengguna, status kunci akun, dan soft delete.</p>
@@ -51,6 +51,8 @@
         <th class="py-3.5 px-4">Status</th>
         <th class="py-3.5 px-4">Gagal Login</th>
         <th class="py-3.5 px-4">Dibuat</th>
+        <th class="py-3.5 px-4">Diperbarui</th>
+        <th class="py-3.5 px-4">Dihapus</th>
         <th class="py-3.5 px-4 text-center">Aksi</th>
     </HeaderTemplate>
     <RowTemplate Context="user">
@@ -72,6 +74,8 @@
         </td>
         <td class="py-3.5 px-4">@user.LoginFailed / 3</td>
         <td class="py-3.5 px-4 text-slate-500">@user.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+        <td class="py-3.5 px-4 text-slate-500">@user.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+        <td class="py-3.5 px-4 text-slate-500">@(user.DeletedAt.HasValue ? user.DeletedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm") : "-")</td>
         <td class="py-3.5 px-4 text-center">
             <ActionMenu>
                 <button type="button"
@@ -161,6 +165,46 @@
             <div class="flex justify-between py-2 border-b border-slate-100">
                 <span class="text-slate-500">Dibuat Pada</span>
                 <span class="text-slate-700">@detailingUser.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Diperbarui Pada</span>
+                <span class="text-slate-700">@detailingUser.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Dihapus Pada</span>
+                <span class="text-slate-700">@(detailingUser.DeletedAt.HasValue ? detailingUser.DeletedAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Created By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.CreatedBy?.ToString() ?? "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Updated By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.UpdatedBy?.ToString() ?? "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Deleted By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.DeletedBy?.ToString() ?? "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Diperbarui Pada</span>
+                <span class="text-slate-700">@detailingUser.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Dihapus Pada</span>
+                <span class="text-slate-700">@(detailingUser.DeletedAt.HasValue ? detailingUser.DeletedAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Created By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.CreatedBy?.ToString() ?? "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Updated By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.UpdatedBy?.ToString() ?? "-")</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Deleted By</span>
+                <span class="font-mono text-xs text-slate-700">@(detailingUser.DeletedBy?.ToString() ?? "-")</span>
             </div>
         </div>
         <div class="flex justify-end mt-6">

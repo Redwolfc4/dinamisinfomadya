@@ -60,6 +60,11 @@
                 document.cookie = name + "=; Max-Age=-99999999; path=/; SameSite=Lax";
             }
         };
+        window.getElementRect = function (el) {
+            if (!el) return { top: 0, bottom: 0, left: 0, right: 0 };
+            const r = el.getBoundingClientRect();
+            return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, innerWidth: window.innerWidth, innerHeight: window.innerHeight };
+        };
     </script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>

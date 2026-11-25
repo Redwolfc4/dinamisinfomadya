@@ -72,7 +72,11 @@ public class UserService
                 LoginFailed = u.LoginFailed,
                 IsLocked = u.IsLocked,
                 CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
+                UpdatedAt = u.UpdatedAt,
+                DeletedAt = u.DeletedAt,
+                CreatedBy = u.CreatedBy,
+                UpdatedBy = u.UpdatedBy,
+                DeletedBy = u.DeletedBy
             })
             .ToListAsync();
 
