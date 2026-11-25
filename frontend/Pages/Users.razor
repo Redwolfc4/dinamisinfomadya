@@ -43,7 +43,7 @@
     </div>
 
     <div class="flex-1 flex flex-col">
-        <BaseTable TItem="UserDto" Items="PagedUsers" IsLoading="isLoading" LoadingMessage="Memuat data pengguna..."
+        <BaseTable TItem="UserDto" Items="users" IsLoading="isLoading" LoadingMessage="Memuat data pengguna..."
                    EmptyMessage="Belum ada data pengguna aktif.">
     <HeaderTemplate>
         <th class="py-3.5 px-4">Nama Lengkap</th>
@@ -95,11 +95,11 @@
 </BaseTable>
     </div>
 
-    @if (!isLoading && FilteredUsers.Any())
+    @if (!isLoading && users.Any())
     {
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-2 text-sm text-slate-600">
             <div>
-                Menampilkan <span class="font-semibold text-slate-800">@StartEntry</span>–<span class="font-semibold text-slate-800">@EndEntry</span> dari <span class="font-semibold text-slate-800">@FilteredUsers.Count</span> data
+                Menampilkan <span class="font-semibold text-slate-800">@StartEntry</span>–<span class="font-semibold text-slate-800">@EndEntry</span> dari <span class="font-semibold text-slate-800">@totalCount</span> data
             </div>
             <div class="flex items-center gap-1.5">
                 <button type="button"
@@ -108,7 +108,7 @@
                         @onclick="() => GoToPage(currentPage - 1)">
                     Prev
                 </button>
-                @for (int p = 1; p <= TotalPages; p++)
+                @for (int p = 1; p <= totalPages; p++)
                 {
                     var pageNum = p;
                     <button type="button"
@@ -119,7 +119,7 @@
                 }
                 <button type="button"
                         class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                        disabled="@(currentPage >= TotalPages)"
+                        disabled="@(currentPage >= totalPages)"
                         @onclick="() => GoToPage(currentPage + 1)">
                     Next
                 </button>
@@ -262,45 +262,48 @@
     private string searchQuery = string.Empty;
     private int pageSize = 10;
     private int currentPage = 1;
+    private int totalCount = 0;
+    private int totalPages = 1;
+    private CancellationTokenSource? _searchCts;
 
-    private List<UserDto> FilteredUsers => string.IsNullOrWhiteSpace(searchQuery)
-        ? users
-        : users.Where(u =>
-            u.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            u.Username.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            (u.IsLocked ? "terkunci locked" : "aktif").Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            $"{u.LoginFailed}".Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-            u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm").Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-        ).ToList();
+    private int StartEntry => totalCount == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+    private int EndEntry => Math.Min(currentPage * pageSize, totalCount);
 
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count / (double)pageSize));
-
-    private List<UserDto> PagedUsers => FilteredUsers
-        .Skip((currentPage - 1) * pageSize)
-        .Take(pageSize)
-        .ToList();
-
-    private int StartEntry => FilteredUsers.Count == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
-    private int EndEntry => Math.Min(currentPage * pageSize, FilteredUsers.Count);
-
-    private void OnSearchChanged(ChangeEventArgs e)
+    private async Task OnSearchChanged(ChangeEventArgs e)
     {
         searchQuery = e.Value?.ToString() ?? string.Empty;
         currentPage = 1;
+
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        try
+        {
+            await Task.Delay(350, token);
+            await LoadUsersAsync();
+        }
+        catch (TaskCanceledException)
+        {
+            // Abaikan jika user masih mengetik
+        }
     }
 
-    private void OnPageSizeChanged(ChangeEventArgs e)
+    private async Task OnPageSizeChanged(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out var size) && size > 0)
         {
             pageSize = size;
             currentPage = 1;
+            await LoadUsersAsync();
         }
     }
 
-    private void GoToPage(int page)
+    private async Task GoToPage(int page)
     {
-        currentPage = Math.Clamp(page, 1, TotalPages);
+        currentPage = Math.Clamp(page, 1, totalPages);
+        await LoadUsersAsync();
     }
     private bool isSubmitting = false;
     private string alertMessage = string.Empty;
@@ -352,7 +355,7 @@
     private async Task LoadUsersAsync()
     {
         isLoading = true;
-        var (success, message, data) = await UserApi.GetUsersAsync();
+        var (success, message, data, count, pages) = await UserApi.GetUsersPagedAsync(searchQuery, currentPage, pageSize);
         isLoading = false;
 
         if (!success)
@@ -362,6 +365,8 @@
         }
 
         users = data;
+        totalCount = count;
+        totalPages = pages;
     }
 
     private void OpenDetailModal(UserDto user)

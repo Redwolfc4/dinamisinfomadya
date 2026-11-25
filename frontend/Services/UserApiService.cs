@@ -24,11 +24,50 @@ public class UserApiService
 
     private async Task AttachTokenAsync()
     {
-        var token = await _js.InvokeAsync<string?>("localStorage.getItem", "authToken");
+        var token = await _js.InvokeAsync<string?>("authCookie.get", "dinamis_auth_token");
         if (!string.IsNullOrWhiteSpace(token))
         {
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
+    }
+
+    public async Task<(bool Success, string Message, List<UserDto> Data, int TotalCount, int TotalPages)> GetUsersPagedAsync(
+        string? search = null,
+        int page = 1,
+        int pageSize = 10)
+    {
+        try
+        {
+            await AttachTokenAsync();
+            var url = $"api/users?page={page}&pageSize={pageSize}";
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                url += $"&search={Uri.EscapeDataString(search.Trim())}";
+            }
+
+            var response = await _http.GetAsync(url);
+            var raw = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return (false, $"Gagal memuat data user (HTTP {(int)response.StatusCode}).", [], 0, 1);
+            }
+
+            var parsed = JsonSerializer.Deserialize<PagedUsersApiResult>(raw, JsonOptions);
+            return (true, "OK", parsed?.Data ?? [], parsed?.TotalCount ?? 0, Math.Max(1, parsed?.TotalPages ?? 1));
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Tidak dapat terhubung ke server: {ex.Message}", [], 0, 1);
+        }
+    }
+
+    private class PagedUsersApiResult
+    {
+        public bool Success { get; set; }
+        public List<UserDto>? Data { get; set; }
+        public int TotalCount { get; set; }
+        public int TotalPages { get; set; }
     }
 
     public async Task<(bool Success, string Message, List<UserDto> Data)> GetUsersAsync()
