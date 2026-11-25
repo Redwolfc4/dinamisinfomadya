@@ -40,20 +40,15 @@ public class LoginService
             };
         }
 
-        if (user.IsLocked)
-        {
-            return LockedResponse(user.LoginFailed);
-        }
+        var result = _hasher.VerifyHashedPassword(user, user.Password, password);
 
-        var result = _hasher.VerifyHashedPassword(user, user.Password, request.Password);
-
-        if (result == PasswordVerificationResult.Failed)
+        if (result == PasswordVerificationResult.Failed || user.IsLocked)
         {
             await _context.Users
-                .Where(u => u.Id == user.Id && !u.IsLocked)
+                .Where(u => u.Id == user.Id)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(u => u.LoginFailed, u => u.LoginFailed + 1)
-                    .SetProperty(u => u.IsLocked, u => u.LoginFailed + 1 > 3)
+                    .SetProperty(u => u.IsLocked, u => u.LoginFailed + 1 >= MaxLoginAttempts)
                     .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
 
             user = await _context.Users

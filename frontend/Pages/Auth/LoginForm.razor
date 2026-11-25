@@ -1,4 +1,5 @@
 @inject AuthApiService AuthApi
+@inject NavigationManager Navigation
 
 <div class="form-content-wrap">
     <!-- App Logo -->
@@ -26,28 +27,18 @@
                    Placeholder="••••••••••••" TabIndex="2" @bind-Value="loginPassword" Required="true"
                    HasError="showErrorAlert" ErrorMessage="@errorMessage" />
 
-        <!-- Options: Remember Me & Forgot Password -->
+        <!-- Options: Remember Me -->
         <div class="form-options-row">
             <label class="checkbox-label">
                 <input type="checkbox" class="custom-checkbox" tabindex="3" @bind="rememberMe" />
                 <span>Remember me</span>
             </label>
-            <a href="javascript:void(0)" class="link-forgot" tabindex="5" @onclick="HandleForgotPassword">
-                Forgot password?
-            </a>
         </div>
 
         <PrimaryButton Type="submit" TabIndex="4" IsLoading="isSubmitting" LoadingText="Signing In...">
             <span>Continue</span>
         </PrimaryButton>
     </form>
-
-    <!-- Trouble Signing In -->
-    <div class="help-links-wrap">
-        <a href="javascript:void(0)" class="link-help" tabindex="6" @onclick="HandleTroubleSignIn">
-            Have trouble signing in?
-        </a>
-    </div>
 
     <!-- Mode Switch Prompt -->
     <div class="switch-mode-prompt">
@@ -147,12 +138,8 @@
         showErrorAlert = false;
         errorMessage = string.Empty;
         await OnNotify.InvokeAsync(("Success", response.Message));
+        await Task.Delay(800);
+        Navigation.NavigateTo("/counter");
     }
-
-    private Task HandleForgotPassword() =>
-        OnNotify.InvokeAsync(("Info", "Password reset link sent to your email!"));
-
-    private Task HandleTroubleSignIn() =>
-        OnNotify.InvokeAsync(("Info", "Help Center: Contact support@labs.ai"));
 }
 
