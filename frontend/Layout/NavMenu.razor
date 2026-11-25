@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">frontend</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -24,16 +27,65 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div>
+        <div class="nav-item px-3 mt-3">
+            <button type="button"
+                    class="nav-link w-100 text-start border-0 bg-transparent"
+                    @onclick="OpenLogoutModal"
+                    @onclick:stopPropagation="true">
+                <span aria-hidden="true" style="margin-right: 0.5rem;">🚪</span> Logout
+            </button>
+        </div>
     </nav>
 </div>
 
+<BaseModal IsOpen="showLogoutModal"
+           Title="Konfirmasi Logout"
+           OnClose="CloseLogoutModal">
+    <ChildContent>
+        <p style="margin: 0;">Apakah Anda yakin ingin keluar dari sesi saat ini?</p>
+    </ChildContent>
+    <FooterContent>
+        <button type="button"
+                @onclick="CloseLogoutModal"
+                style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #d1d5db; background: #ffffff; color: #374151; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
+            Batal
+        </button>
+        <button type="button"
+                @onclick="ConfirmLogoutAsync"
+                style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; background: #dc2626; color: #ffffff; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
+            Ya, Logout
+        </button>
+    </FooterContent>
+</BaseModal>
+
 @code {
     private bool collapseNavMenu = true;
+    private bool showLogoutModal = false;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string? NavMenuCssClass => collapseNavMenu ? "hidden md:block" : "block";
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void OpenLogoutModal()
+    {
+        showLogoutModal = true;
+    }
+
+    private void CloseLogoutModal()
+    {
+        showLogoutModal = false;
+    }
+
+    private async Task ConfirmLogoutAsync()
+    {
+        showLogoutModal = false;
+        await JS.InvokeVoidAsync("localStorage.removeItem", "dinamis_auth_token");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "dinamis_refresh_token");
+        await JS.InvokeVoidAsync("sessionStorage.removeItem", "dinamis_auth_token");
+        await JS.InvokeVoidAsync("sessionStorage.removeItem", "dinamis_refresh_token");
+        Navigation.NavigateTo("/");
     }
 }

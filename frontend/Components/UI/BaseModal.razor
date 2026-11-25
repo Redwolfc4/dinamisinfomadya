@@ -1,0 +1,60 @@
+@if (IsOpen)
+{
+    <div style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); animation: fadeInModal 0.18s ease;"
+         @onclick="HandleBackdropClick">
+        <div style="width: 100%; max-width: @MaxWidth; background: #ffffff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; border: 1px solid #e5e7eb;"
+             @onclick:stopPropagation="true">
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.15rem 1.5rem; border-bottom: 1px solid #f1f5f9;">
+                    <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #111827;">@Title</h3>
+                    <button type="button"
+                            @onclick="CloseAsync"
+                            style="background: transparent; border: none; color: #9ca3af; font-size: 1.1rem; cursor: pointer; padding: 0.25rem; line-height: 1;"
+                            aria-label="Close modal">
+                        ✕
+                    </button>
+                </div>
+            }
+
+            <div style="padding: 1.25rem 1.5rem; color: #374151; font-size: 0.925rem; line-height: 1.6;">
+                @ChildContent
+            </div>
+
+            @if (FooterContent != null)
+            {
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid #f1f5f9;">
+                    @FooterContent
+                </div>
+            }
+        </div>
+    </div>
+
+    <style>
+        @@keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string MaxWidth { get; set; } = "420px";
+    [Parameter] public bool CloseOnBackdrop { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private Task HandleBackdropClick()
+    {
+        return CloseOnBackdrop ? CloseAsync() : Task.CompletedTask;
+    }
+
+    private Task CloseAsync()
+    {
+        return OnClose.InvokeAsync();
+    }
+}
+
