@@ -124,75 +124,111 @@
         }
     </div>
 
-    <BaseModal IsOpen="@(detailingUser != null)" Title="Detail Pengguna" MaxWidthClass="max-w-md"
-               OnClose="() => detailingUser = null">
+<BaseModal IsOpen="@(detailingUser != null)"
+           Title="Detail Pengguna"
+           MaxWidthClass="max-w-xl"
+           OnClose="() => detailingUser = null">
+    <ChildContent>
         @if (detailingUser != null)
         {
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Full Name</span>
-                    <span class="font-semibold text-slate-900">@detailingUser.FullName</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Username</span>
-                    <span class="font-medium text-slate-800">@detailingUser.Username</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Status</span>
-                    <span class="font-semibold @(detailingUser.IsLocked ? "text-red-600" : "text-emerald-600")">
-                        @(detailingUser.IsLocked ? "Terkunci (Locked)" : "Aktif")
-                    </span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Gagal Login</span>
-                    <span class="font-medium text-slate-800">@detailingUser.LoginFailed kali</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Dibuat Pada</span>
-                    <span class="text-slate-700">@detailingUser.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Diperbarui Pada</span>
-                    <span class="text-slate-700">@detailingUser.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-100">
-                    <span class="text-slate-500">Dihapus Pada</span>
-                    <span class="text-slate-700">@(detailingUser.DeletedAt.HasValue?
-                                    detailingUser.DeletedAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "-")</span>
+            <div class="space-y-6 text-sm">
+                <!-- User Profile Section -->
+                <div class="flex items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700 shrink-0">
+                            @GetInitials(detailingUser.FullName)
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-base font-semibold text-slate-900 truncate">@detailingUser.FullName</p>
+                            <p class="text-xs text-slate-500 truncate">@@@detailingUser.Username</p>
+                        </div>
                     </div>
-                    <div class="pt-2">
-                        <span class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Audit Trail</span>
-                        <div class="grid grid-cols-1 gap-2 rounded-xl bg-slate-50 border border-slate-200/80 p-3">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-xs font-medium text-slate-500">Created By</span>
-                                <span
-                                    class="font-mono text-[11px] px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 truncate max-w-[230px]">@(detailingUser.CreatedBy?.ToString()
-                                    ?? "-")</span>
-                                </div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="text-xs font-medium text-slate-500">Updated By</span>
-                                    <span
-                                        class="font-mono text-[11px] px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 truncate max-w-[230px]">@(detailingUser.UpdatedBy?.ToString()
-                                        ?? "-")</span>
-                                    </div>
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-xs font-medium text-slate-500">Deleted By</span>
-                                        <span
-                                            class="font-mono text-[11px] px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 truncate max-w-[230px]">@(detailingUser.DeletedBy?.ToString()
-                                            ?? "-")</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex justify-end mt-6">
-                                <button type="button"
-                                        class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white transition cursor-pointer"
-                                        @onclick="() => detailingUser = null">
-                                    Tutup
-                                </button>
-                            </div>
-                        }
-                    </BaseModal>
+                    @if (detailingUser.IsLocked)
+                    {
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-red-600"></span>
+                            Terkunci
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                            Aktif
+                        </span>
+                    }
+                </div>
+
+                <!-- Informasi Akun -->
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Informasi Akun</p>
+                    <div class="divide-y divide-slate-100">
+                        <div class="flex items-center justify-between py-3 gap-4">
+                            <span class="text-[13px] text-slate-500">Full Name</span>
+                            <span class="text-sm font-medium text-slate-900 text-right">@detailingUser.FullName</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 gap-4">
+                            <span class="text-[13px] text-slate-500">Username</span>
+                            <span class="text-sm font-medium text-slate-900 text-right">@detailingUser.Username</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 gap-4">
+                            <span class="text-[13px] text-slate-500">Status</span>
+                            <span class="text-sm font-medium @(detailingUser.IsLocked ? "text-red-600" : "text-emerald-600") text-right">
+                                @(detailingUser.IsLocked ? "Terkunci" : "Aktif")
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 gap-4">
+                            <span class="text-[13px] text-slate-500">Gagal Login</span>
+                            <span class="text-sm font-medium @(detailingUser.LoginFailed > 0 ? "text-red-600" : "text-slate-900") text-right">
+                                @detailingUser.LoginFailed kali
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Trail -->
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Audit Trail</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs font-semibold text-slate-500">
+                                    <th class="py-2.5 pr-3">Aktivitas</th>
+                                    <th class="py-2.5 px-3">Oleh</th>
+                                    <th class="py-2.5 pl-3 text-right">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-sm">
+                                <tr>
+                                    <td class="py-3 pr-3 font-medium text-slate-800">Dibuat</td>
+                                    <td class="py-3 px-3 text-slate-600">@(detailingUser.CreatedBy?.ToString() ?? "—")</td>
+                                    <td class="py-3 pl-3 text-slate-600 text-right whitespace-nowrap">@detailingUser.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pr-3 font-medium text-slate-800">Diperbarui</td>
+                                    <td class="py-3 px-3 text-slate-600">@(detailingUser.UpdatedBy?.ToString() ?? "—")</td>
+                                    <td class="py-3 pl-3 text-slate-600 text-right whitespace-nowrap">@detailingUser.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pr-3 font-medium text-slate-800">Dihapus</td>
+                                    <td class="py-3 px-3 text-slate-600">@(detailingUser.DeletedBy?.ToString() ?? "—")</td>
+                                    <td class="py-3 pl-3 text-slate-600 text-right whitespace-nowrap">@(detailingUser.DeletedAt.HasValue ? detailingUser.DeletedAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "—")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </ChildContent>
+    <FooterContent>
+        <button type="button"
+                class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white transition cursor-pointer"
+                @onclick="() => detailingUser = null">
+            Tutup
+        </button>
+    </FooterContent>
+</BaseModal>
 
                     <BaseModal IsOpen="@(editingUser != null)" Title="Edit Pengguna" MaxWidthClass="max-w-md" OnClose="CloseEditModal">
                         <form @onsubmit="HandleEditSubmit" novalidate>
@@ -373,6 +409,15 @@
     private void OpenDetailModal(UserDto user)
     {
         detailingUser = user;
+    }
+
+    private static string GetInitials(string fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "?";
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 1
+            ? parts[0][0].ToString().ToUpperInvariant()
+            : $"{char.ToUpperInvariant(parts[0][0])}{char.ToUpperInvariant(parts[1][0])}";
     }
 
     private void OpenEditModal(UserDto user)
