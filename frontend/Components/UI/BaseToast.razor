@@ -1,0 +1,41 @@
+@if (IsVisible && !string.IsNullOrWhiteSpace(Message))
+{
+    <div class="fixed bottom-5 right-5 z-50 max-w-sm w-full px-4">
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium text-white @GetToastClasses()">
+            <span class="shrink-0">@GetIcon()</span>
+            <span class="flex-1">@Message</span>
+            @if (OnDismiss.HasDelegate)
+            {
+                <button type="button"
+                        class="text-xs opacity-75 hover:opacity-100 cursor-pointer ml-2"
+                        @onclick="OnDismiss">
+                    ✕
+                </button>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public string Type { get; set; } = "Info";
+    [Parameter] public EventCallback OnDismiss { get; set; }
+
+    private string GetToastClasses() => Type switch
+    {
+        "Success" => "bg-emerald-800 border-emerald-500",
+        "Error" => "bg-red-800 border-red-500",
+        "Warning" => "bg-amber-800 border-amber-500",
+        _ => "bg-slate-900 border-blue-500"
+    };
+
+    private string GetIcon() => Type switch
+    {
+        "Success" => "✓",
+        "Error" => "✕",
+        "Warning" => "⚠",
+        _ => "ℹ"
+    };
+}
+

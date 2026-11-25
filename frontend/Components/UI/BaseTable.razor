@@ -1,0 +1,45 @@
+@typeparam TItem
+
+@if (IsLoading)
+{
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500 text-sm">
+        @LoadingMessage
+    </div>
+}
+else if (Items == null || !Items.Any())
+{
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500 text-sm">
+        @EmptyMessage
+    </div>
+}
+else
+{
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        @HeaderTemplate
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+                    @foreach (var item in Items)
+                    {
+                        <tr class="hover:bg-slate-50/70 transition">
+                            @RowTemplate?.Invoke(item)
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyCollection<TItem>? Items { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string LoadingMessage { get; set; } = "Memuat data...";
+    [Parameter] public string EmptyMessage { get; set; } = "Belum ada data.";
+    [Parameter] public RenderFragment? HeaderTemplate { get; set; }
+    [Parameter] public RenderFragment<TItem>? RowTemplate { get; set; }
+}
