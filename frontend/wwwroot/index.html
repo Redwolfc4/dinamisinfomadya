@@ -36,6 +36,31 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script>
+        window.authCookie = {
+            set: function (name, value, days) {
+                let expires = "";
+                if (days) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + encodeURIComponent(value || "") + expires + "; path=/; SameSite=Lax";
+            },
+            get: function (name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i].trim();
+                    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+                }
+                return null;
+            },
+            remove: function (name) {
+                document.cookie = name + "=; Max-Age=-99999999; path=/; SameSite=Lax";
+            }
+        };
+    </script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 

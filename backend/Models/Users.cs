@@ -33,6 +33,13 @@ public class User
     [Column("is_locked")]
     public bool IsLocked { get; set; } = false;
 
+    [MaxLength(255)]
+    [Column("refresh_token")]
+    public string? RefreshToken { get; set; } = null;
+
+    [Column("refresh_token_expires_at")]
+    public DateTime? RefreshTokenExpiresAt { get; set; } = null;
+
     // tanggal pembuatan & audit trail
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

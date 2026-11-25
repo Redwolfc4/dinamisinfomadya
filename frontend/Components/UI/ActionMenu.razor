@@ -1,0 +1,30 @@
+<div class="relative inline-block text-left">
+    <button type="button"
+            class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition cursor-pointer"
+            @onclick="ToggleMenu" @onclick:stopPropagation="true" aria-label="Opsi lainnya" title="Opsi">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <circle cx="4" cy="10" r="1.75" />
+            <circle cx="10" cy="10" r="1.75" />
+            <circle cx="16" cy="10" r="1.75" />
+        </svg>
+    </button>
+
+    @if (_isOpen)
+    {
+        <div class="fixed inset-0 z-40" @onclick="CloseMenu"></div>
+        <div class="absolute right-0 mt-1.5 w-36 rounded-xl bg-white shadow-lg border border-slate-200/80 py-1.5 z-50 text-left"
+             @onclick="CloseMenu">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _isOpen = false;
+
+    private void ToggleMenu() => _isOpen = !_isOpen;
+    private void CloseMenu() => _isOpen = false;
+}
+

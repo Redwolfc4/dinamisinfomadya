@@ -1,5 +1,6 @@
-﻿@page "/weather"
+@page "/weather"
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Weather</PageTitle>
 
@@ -41,7 +42,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"{Navigation.BaseUri}sample-data/weather.json");
     }
 
     public class WeatherForecast

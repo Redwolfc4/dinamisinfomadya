@@ -13,5 +13,8 @@ public class UpdateUserRequest
     public string Username { get; set; } = string.Empty;
 
     public bool IsLocked { get; set; }
+
+    [RegularExpression(@"\A(?=.{8,128}\z)(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).+\z", MatchTimeoutInMilliseconds = 1000, ErrorMessage = "Password harus mengandung minimal 8 karakter, 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 simbol (!@#$%^&*).")]
+    public string? Password { get; set; }
 }
 

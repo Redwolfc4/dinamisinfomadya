@@ -1,5 +1,7 @@
 using backend.Data;
 using backend.DTOs;
+using backend.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
@@ -74,10 +76,27 @@ public class UserService
         user.Username = normalizedUsername;
         user.IsLocked = request.IsLocked;
 
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var hasher = new PasswordHasher<User>();
+            user.Password = hasher.HashPassword(user, request.Password);
+        }
+
         // Jika lock dimatikan secara manual, reset LoginFailed ke 0
         if (!request.IsLocked)
         {
             user.LoginFailed = 0;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            if (request.Password.Length < 8)
+            {
+                return (false, "Password baru minimal 8 karakter.", null);
+            }
+
+            var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<backend.Models.User>();
+            user.Password = hasher.HashPassword(user, request.Password);
         }
 
         user.UpdatedAt = DateTime.UtcNow;

@@ -65,6 +65,15 @@ namespace backend.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("password");
 
+                    b.Property<string>("RefreshToken")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("refresh_token");
+
+                    b.Property<DateTime?>("RefreshTokenExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("refresh_token_expires_at");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");

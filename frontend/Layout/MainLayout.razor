@@ -1,17 +1,43 @@
 @inherits LayoutComponentBase
 @using frontend.Layout
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inject IJSRuntime JS
+@inject AuthApiService AuthApi
+@inject NavigationManager Navigation
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+@if (isAuthorized)
+{
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <main>
+            <div class="top-row px-4">
+                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            </div>
+
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </div>
+}
+
+@code {
+    private bool isAuthorized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JS.InvokeAsync<string?>("authCookie.get", "dinamis_auth_token");
+
+        if (string.IsNullOrWhiteSpace(token) || !await AuthApi.ValidateTokenAsync(token))
+        {
+            await JS.InvokeVoidAsync("authCookie.remove", "dinamis_auth_token");
+            await JS.InvokeVoidAsync("authCookie.remove", "dinamis_refresh_token");
+            Navigation.NavigateTo("/login", replace: true);
+            return;
+        }
+
+        isAuthorized = true;
+    }
+}

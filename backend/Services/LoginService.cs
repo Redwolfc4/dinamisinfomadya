@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using backend.Data;
 using backend.DTOs;
@@ -70,11 +71,16 @@ public class LoginService
             };
         }
 
-        // Reset counter jika login berhasil
+        var refreshToken = GenerateRefreshToken();
+        var refreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
+
+        // Reset counter & simpan refresh token (7 hari) jika login berhasil
         var updated = await _context.Users
             .Where(u => u.Id == user.Id && !u.IsLocked)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(u => u.LoginFailed, 0)
+                .SetProperty(u => u.RefreshToken, refreshToken)
+                .SetProperty(u => u.RefreshTokenExpiresAt, refreshTokenExpiresAt)
                 .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
 
         if (updated == 0)
@@ -87,9 +93,51 @@ public class LoginService
             Success = true,
             Message = "Login berhasil.",
             Token = GenerateToken(user),
+            RefreshToken = refreshToken,
             LoginFailedCount = 0,
             IsLocked = false
         };
+    }
+
+    public async Task<LoginResponse> RefreshTokenAsync(string refreshToken)
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return new LoginResponse { Success = false, Message = "Refresh token tidak valid." };
+        }
+
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+        if (user == null || user.IsLocked || user.RefreshTokenExpiresAt == null || user.RefreshTokenExpiresAt <= DateTime.UtcNow)
+        {
+            return new LoginResponse
+            {
+                Success = false,
+                Message = "Sesi telah berakhir. Silakan login kembali."
+            };
+        }
+
+        return new LoginResponse
+        {
+            Success = true,
+            Message = "Token berhasil diperbarui.",
+            Token = GenerateToken(user),
+            RefreshToken = user.RefreshToken,
+            LoginFailedCount = 0,
+            IsLocked = false
+        };
+    }
+
+    public async Task LogoutAsync(Guid userId)
+    {
+        await _context.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.RefreshToken, (string?)null)
+                .SetProperty(u => u.RefreshTokenExpiresAt, (DateTime?)null)
+                .SetProperty(u => u.UpdatedAt, DateTime.UtcNow));
     }
 
     private static LoginResponse LockedResponse(int failed)
@@ -122,11 +170,17 @@ public class LoginService
             issuer: UserService.Issuer,
             audience: UserService.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: credentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static string GenerateRefreshToken()
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(randomBytes);
     }
 }
 

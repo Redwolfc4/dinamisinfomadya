@@ -60,6 +60,37 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Memperbarui Auth Token (JWT) menggunakan Refresh Token yang masih aktif (maks. 7 hari).
+    /// </summary>
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest request)
+    {
+        var result = await _loginService.RefreshTokenAsync(request.RefreshToken);
+        if (!result.Success)
+        {
+            return Unauthorized(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Logout dan menghapus Refresh Token dari database.
+    /// </summary>
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdClaim, out var userId))
+        {
+            await _loginService.LogoutAsync(userId);
+        }
+
+        return Ok(new { Success = true, Message = "Logout berhasil." });
+    }
+
+    /// <summary>
     /// Mengambil informasi pengguna saat ini menggunakan JWT token.
     /// </summary>
     [Authorize]

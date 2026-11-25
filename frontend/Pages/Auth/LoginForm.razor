@@ -145,11 +145,11 @@
 
         if (!string.IsNullOrWhiteSpace(response.Token))
         {
-            var storage = rememberMe ? "localStorage" : "sessionStorage";
-            await JS.InvokeVoidAsync($"{storage}.setItem", "dinamis_auth_token", response.Token);
+            int? days = rememberMe ? 7 : null;
+            await JS.InvokeVoidAsync("authCookie.set", "dinamis_auth_token", response.Token, days);
             if (!string.IsNullOrWhiteSpace(response.RefreshToken))
             {
-                await JS.InvokeVoidAsync($"{storage}.setItem", "dinamis_refresh_token", response.RefreshToken);
+                await JS.InvokeVoidAsync("authCookie.set", "dinamis_refresh_token", response.RefreshToken, days);
             }
         }
 
