@@ -1,0 +1,27 @@
+@page "/locked"
+@layout AuthLayout
+@inject NavigationManager Navigation
+
+<PageTitle>Akun Terkunci — AI Labs</PageTitle>
+
+<div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-200/80 p-8 flex flex-col items-center text-center">
+        <div class="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center mb-4 text-red-600 shadow-sm">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                <circle cx="12" cy="16" r="1" fill="currentColor" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Akun Terkunci</h2>
+        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+            Akun Anda telah dikunci. Silakan hubungi administrator untuk membuka kembali.
+        </p>
+        <button type="button"
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition cursor-pointer"
+                @onclick='() => Navigation.NavigateTo("/")'>
+            Gunakan Akun Lain
+        </button>
+    </div>
+</div>
+

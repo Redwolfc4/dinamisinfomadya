@@ -128,6 +128,13 @@
             var toastType = response.IsLocked ? "Warning" : "Error";
             await OnNotify.InvokeAsync((toastType, msg));
 
+            if (response.IsLocked)
+            {
+                await Task.Delay(800);
+                Navigation.NavigateTo("/locked");
+                return;
+            }
+
             if (_passwordInput is not null)
             {
                 await _passwordInput.FocusAsync();
