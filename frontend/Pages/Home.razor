@@ -1,18 +1,19 @@
 @page "/"
+@page "/login"
+@page "/register"
 @layout AuthLayout
+@inject NavigationManager Navigation
 
 <PageTitle>AI Labs — Select &amp; Combine &amp; Integrate</PageTitle>
 
 <AuthSplitLayout IsRegisterMode="isRegisterMode">
     @if (!isRegisterMode)
     {
-        <LoginForm OnSwitchToRegister="() => SetMode(true)"
-                   OnNotify="HandleNotification" />
+        <LoginForm OnSwitchToRegister="() => SetMode(true)" OnNotify="HandleNotification" />
     }
     else
     {
-        <RegisterForm OnSwitchToLogin="() => SetMode(false)"
-                      OnNotify="HandleNotification" />
+        <RegisterForm OnSwitchToLogin="() => SetMode(false)" OnNotify="HandleNotification" />
     }
 </AuthSplitLayout>
 
@@ -32,10 +33,16 @@
     private bool isRegisterMode = false;
     private ToastMessage? activeToast;
 
+    protected override void OnParametersSet()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).TrimEnd('/').ToLowerInvariant();
+        isRegisterMode = path == "register";
+    }
+
     private void SetMode(bool registerMode)
     {
         isRegisterMode = registerMode;
-        StateHasChanged();
+        Navigation.NavigateTo(registerMode ? "/register" : "/login");
     }
 
     private void HandleNotification((string Type, string Message) notification)
