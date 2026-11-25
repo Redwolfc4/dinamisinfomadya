@@ -30,8 +30,7 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="users">
-                <svg class="bi" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg class="bi" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -40,10 +39,12 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <button type="button" class="nav-link w-100 text-start border-0 bg-transparent" style="color: #d7d7d7;"
-                    @onclick="OpenLogoutModal" @onclick:stopPropagation="true">
-                <svg class="bi" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <button type="button"
+                    class="nav-link w-100 text-start border-0 bg-transparent"
+                    style="color: #d7d7d7;"
+                    @onclick="OpenLogoutModal"
+                    @onclick:stopPropagation="true">
+                <svg class="bi" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                     <polyline points="16 17 21 12 16 7" />
                     <line x1="21" y1="12" x2="9" y2="12" />
@@ -53,16 +54,20 @@
     </nav>
 </div>
 
-<BaseModal IsOpen="showLogoutModal" Title="Konfirmasi Logout" OnClose="CloseLogoutModal">
+<BaseModal IsOpen="showLogoutModal"
+           Title="Konfirmasi Logout"
+           OnClose="CloseLogoutModal">
     <ChildContent>
         <p style="margin: 0;">Apakah Anda yakin ingin keluar dari sesi saat ini?</p>
     </ChildContent>
     <FooterContent>
-        <button type="button" @onclick="CloseLogoutModal"
+        <button type="button"
+                @onclick="CloseLogoutModal"
                 style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #d1d5db; background: #ffffff; color: #374151; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
             Batal
         </button>
-        <button type="button" @onclick="ConfirmLogoutAsync"
+        <button type="button"
+                @onclick="ConfirmLogoutAsync"
                 style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; background: #dc2626; color: #ffffff; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
             Ya, Logout
         </button>
