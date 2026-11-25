@@ -13,39 +13,33 @@
                 <div @key="toast.Id"
                      class="transition-all duration-300 ease-out @(isVisibleInStack ? "opacity-100" : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto") @(reverseIndex > 0 ? "mb-[-58px] group-hover:mb-0" : "")"
                      style="@GetStackStyle(reverseIndex)">
-                    <div
-                        class="relative overflow-hidden rounded-xl shadow-lg border text-sm font-medium text-white @GetToastClasses(toast.Type)">
+                    <div class="relative overflow-hidden rounded-xl shadow-lg border text-sm font-medium text-white @GetToastClasses(toast.Type)">
                         <div class="flex items-center gap-3 px-4 py-3">
                             <span class="shrink-0">
                                 @switch (toast.Type)
                                 {
                                     case "Success":
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
-                                             stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10" />
                                             <polyline points="9 12 11.5 14.5 16 9.5" />
                                         </svg>
                                         break;
                                     case "Error":
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
-                                             stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10" />
                                             <line x1="12" y1="8" x2="12" y2="12" />
                                             <line x1="12" y1="16" x2="12.01" y2="16" />
                                         </svg>
                                         break;
                                     case "Warning":
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
-                                             stroke-linecap="round" stroke-linejoin="round">
-                                            <path
-                                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                                             <line x1="12" y1="9" x2="12" y2="13" />
                                             <line x1="12" y1="17" x2="12.01" y2="17" />
                                         </svg>
                                         break;
                                     default:
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
-                                             stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10" />
                                             <line x1="12" y1="16" x2="12" y2="12" />
                                             <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -54,10 +48,11 @@
                                 }
                             </span>
                             <span class="flex-1">@toast.Message</span>
-                            <button type="button" class="text-xs opacity-75 hover:opacity-100 cursor-pointer ml-2"
-                                    @onclick="() => DismissToast(toast.Id)" aria-label="Tutup">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
-                                     viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button"
+                                    class="text-xs opacity-75 hover:opacity-100 cursor-pointer ml-2"
+                                    @onclick="() => DismissToast(toast.Id)"
+                                    aria-label="Tutup">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18" />
                                     <line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
@@ -72,15 +67,9 @@
 
     <style>
         @@keyframes toast-progress {
-            from {
-                width: 100%;
-            }
-
-            to {
-                width: 0%;
-            }
+            from { width: 100%; }
+            to { width: 0%; }
         }
-
         .group:hover .toast-stacked-item {
             transform: none !important;
         }
