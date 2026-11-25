@@ -1,19 +1,90 @@
-@if (IsVisible && !string.IsNullOrWhiteSpace(Message))
+@implements IDisposable
+
+@if (_toasts.Count > 0)
 {
-    <div class="fixed bottom-5 right-5 z-[9999] max-w-sm w-full px-4">
-        <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium text-white @GetToastClasses()">
-            <span class="shrink-0">@GetIcon()</span>
-            <span class="flex-1">@Message</span>
-            @if (OnDismiss.HasDelegate)
+    <div class="fixed bottom-5 right-5 z-[9999] max-w-sm w-full px-4 group">
+        <div class="relative flex flex-col-reverse gap-2.5">
+            @for (int i = 0; i < _toasts.Count; i++)
             {
-                <button type="button"
-                        class="text-xs opacity-75 hover:opacity-100 cursor-pointer ml-2"
-                        @onclick="OnDismiss">
-                    ✕
-                </button>
+                var toast = _toasts[i];
+                var reverseIndex = _toasts.Count - 1 - i; // 0 = terbaru (paling bawah/depan)
+                var isVisibleInStack = reverseIndex < 3;
+
+                <div @key="toast.Id"
+                     class="transition-all duration-300 ease-out @(isVisibleInStack ? "opacity-100" : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto") @(reverseIndex > 0 ? "mb-[-58px] group-hover:mb-0" : "")"
+                     style="@GetStackStyle(reverseIndex)">
+                    <div
+                        class="relative overflow-hidden rounded-xl shadow-lg border text-sm font-medium text-white @GetToastClasses(toast.Type)">
+                        <div class="flex items-center gap-3 px-4 py-3">
+                            <span class="shrink-0">
+                                @switch (toast.Type)
+                                {
+                                    case "Success":
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="9 12 11.5 14.5 16 9.5" />
+                                        </svg>
+                                        break;
+                                    case "Error":
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <line x1="12" y1="8" x2="12" y2="12" />
+                                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                                        </svg>
+                                        break;
+                                    case "Warning":
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                            <line x1="12" y1="9" x2="12" y2="13" />
+                                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                                        </svg>
+                                        break;
+                                    default:
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
+                                             stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <line x1="12" y1="16" x2="12" y2="12" />
+                                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                                        </svg>
+                                        break;
+                                }
+                            </span>
+                            <span class="flex-1">@toast.Message</span>
+                            <button type="button" class="text-xs opacity-75 hover:opacity-100 cursor-pointer ml-2"
+                                    @onclick="() => DismissToast(toast.Id)" aria-label="Tutup">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
+                                     viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="h-1 bg-white/50" style="animation: toast-progress 3s linear forwards;"></div>
+                    </div>
+                </div>
             }
         </div>
     </div>
+
+    <style>
+        @@keyframes toast-progress {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        .group:hover .toast-stacked-item {
+            transform: none !important;
+        }
+    </style>
 }
 
 @code {
@@ -22,7 +93,91 @@
     [Parameter] public string Type { get; set; } = "Info";
     [Parameter] public EventCallback OnDismiss { get; set; }
 
-    private string GetToastClasses() => Type switch
+    private sealed class ToastEntry
+    {
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public string Message { get; init; } = string.Empty;
+        public string Type { get; init; } = "Info";
+        public CancellationTokenSource Cts { get; init; } = new();
+    }
+
+    private readonly List<ToastEntry> _toasts = [];
+    private string _lastMessage = string.Empty;
+    private bool _wasVisible = false;
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible && !string.IsNullOrWhiteSpace(Message))
+        {
+            if (!_wasVisible || _lastMessage != Message)
+            {
+                _lastMessage = Message;
+                AddToast(Message, Type);
+            }
+        }
+        else if (!IsVisible)
+        {
+            _lastMessage = string.Empty;
+        }
+
+        _wasVisible = IsVisible;
+    }
+
+    private void AddToast(string message, string type)
+    {
+        var entry = new ToastEntry
+        {
+            Message = message,
+            Type = type
+        };
+
+        _toasts.Add(entry);
+        var token = entry.Cts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(3000, token);
+                if (!token.IsCancellationRequested)
+                {
+                    await InvokeAsync(() => DismissToast(entry.Id));
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        }, token);
+    }
+
+    private async Task DismissToast(Guid id)
+    {
+        var item = _toasts.FirstOrDefault(t => t.Id == id);
+        if (item == null) return;
+
+        item.Cts.Cancel();
+        item.Cts.Dispose();
+        _toasts.Remove(item);
+
+        if (_toasts.Count == 0 && OnDismiss.HasDelegate)
+        {
+            await OnDismiss.InvokeAsync();
+        }
+        else
+        {
+            StateHasChanged();
+        }
+    }
+
+    private static string GetStackStyle(int reverseIndex)
+    {
+        if (reverseIndex == 0) return "z-index: 30;";
+        var scale = Math.Max(0.88, 1.0 - (reverseIndex * 0.04));
+        var zIndex = Math.Max(1, 30 - reverseIndex);
+        return $"transform: scale({scale.ToString(System.Globalization.CultureInfo.InvariantCulture)}); z-index: {zIndex};";
+    }
+
+    private static string GetToastClasses(string type) => type switch
     {
         "Success" => "bg-emerald-800 border-emerald-500",
         "Error" => "bg-red-800 border-red-500",
@@ -30,12 +185,13 @@
         _ => "bg-slate-900 border-blue-500"
     };
 
-    private string GetIcon() => Type switch
+    public void Dispose()
     {
-        "Success" => "✓",
-        "Error" => "✕",
-        "Warning" => "⚠",
-        _ => "ℹ"
-    };
+        foreach (var item in _toasts)
+        {
+            item.Cts.Cancel();
+            item.Cts.Dispose();
+        }
+        _toasts.Clear();
+    }
 }
-
