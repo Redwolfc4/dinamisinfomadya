@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using backend.Data;
+using backend.Hubs;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
@@ -80,7 +82,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5181", "https://localhost:7180")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -137,5 +140,6 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<UserHub>("/hubs/users");
 
 app.Run();

@@ -19,10 +19,23 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 0)
     {
-        var users = await _userService.GetAllUsersAsync();
-        return Ok(new { Success = true, Data = users });
+        var (users, totalCount) = await _userService.GetAllUsersAsync(search, page, pageSize);
+        var totalPages = pageSize > 0 ? Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize)) : 1;
+
+        return Ok(new
+        {
+            Success = true,
+            Data = users,
+            TotalCount = totalCount,
+            Page = Math.Max(1, page),
+            PageSize = pageSize,
+            TotalPages = totalPages
+        });
     }
 
     [HttpPut("{id:guid}")]

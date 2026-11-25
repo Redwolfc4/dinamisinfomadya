@@ -4,8 +4,10 @@ using System.Security.Cryptography;
 using System.Text;
 using backend.Data;
 using backend.DTOs;
+using backend.Hubs;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,12 +18,14 @@ public class LoginService
     public const int MaxLoginAttempts = 3;
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IHubContext<UserHub> _hubContext;
     private readonly PasswordHasher<User> _hasher = new();
 
-    public LoginService(AppDbContext context, IConfiguration configuration)
+    public LoginService(AppDbContext context, IConfiguration configuration, IHubContext<UserHub> hubContext)
     {
         _context = context;
         _configuration = configuration;
+        _hubContext = hubContext;
     }
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -56,6 +60,8 @@ public class LoginService
                 .AsNoTracking()
                 .FirstAsync(u => u.Id == user.Id);
 
+            await _hubContext.Clients.All.SendAsync("UserUpdated");
+
             if (user.IsLocked)
             {
                 return LockedResponse(user.LoginFailed);
@@ -87,6 +93,8 @@ public class LoginService
         {
             return LockedResponse(4);
         }
+
+        await _hubContext.Clients.All.SendAsync("UserUpdated");
 
         return new LoginResponse
         {

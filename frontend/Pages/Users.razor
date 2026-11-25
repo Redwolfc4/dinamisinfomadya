@@ -1,18 +1,50 @@
 @page "/users"
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
 @inject UserApiService UserApi
 
 <PageTitle>Manajemen User</PageTitle>
 
-<div class="mb-4">
-    <h1 class="text-2xl font-bold text-slate-900">Manajemen User</h1>
-    <p class="text-sm text-slate-500 mt-1">Kelola informasi pengguna, status kunci akun, dan soft delete.</p>
-</div>
+<div class="min-h-[calc(100vh-5.5rem)] flex flex-col">
+    <div class="mb-4">
+        <h1 class="text-2xl font-bold text-slate-900">Manajemen User</h1>
+        <p class="text-sm text-slate-500 mt-1">Kelola informasi pengguna, status kunci akun, dan soft delete.</p>
+    </div>
 
-<BaseToast IsVisible="@(!string.IsNullOrWhiteSpace(alertMessage))" Message="@alertMessage"
-           Type="@(isAlertError ? "Error" : "Success")" OnDismiss="() => alertMessage = string.Empty" />
+    <BaseToast IsVisible="@(!string.IsNullOrWhiteSpace(alertMessage))" Message="@alertMessage"
+               Type="@(isAlertError ? "Error" : "Success")" OnDismiss="() => alertMessage = string.Empty" />
 
-<BaseTable TItem="UserDto" Items="users" IsLoading="isLoading" LoadingMessage="Memuat data pengguna..."
-           EmptyMessage="Belum ada data pengguna aktif.">
+    <!-- Toolbar: Show & Universal Search -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div class="flex items-center gap-2 text-sm text-slate-600">
+            <span>Show</span>
+            <select class="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                    value="@pageSize"
+                    @onchange="OnPageSizeChanged">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+            <span>entries</span>
+        </div>
+
+        <div class="relative w-full sm:w-72">
+            <input type="text"
+                   class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="Cari semua kolom..."
+                   value="@searchQuery"
+                   @oninput="OnSearchChanged" />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="flex-1 flex flex-col">
+        <BaseTable TItem="UserDto" Items="PagedUsers" IsLoading="isLoading" LoadingMessage="Memuat data pengguna..."
+                   EmptyMessage="Belum ada data pengguna aktif.">
     <HeaderTemplate>
         <th class="py-3.5 px-4">Nama Lengkap</th>
         <th class="py-3.5 px-4">Username</th>
@@ -43,6 +75,11 @@
         <td class="py-3.5 px-4 text-center">
             <ActionMenu>
                 <button type="button"
+                        class="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center gap-2"
+                        @onclick="() => OpenDetailModal(user)">
+                    <span>Detail</span>
+                </button>
+                <button type="button"
                         class="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition cursor-pointer flex items-center gap-2"
                         @onclick="() => OpenEditModal(user)">
                     <span>Edit</span>
@@ -56,6 +93,85 @@
         </td>
     </RowTemplate>
 </BaseTable>
+    </div>
+
+    @if (!isLoading && FilteredUsers.Any())
+    {
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-2 text-sm text-slate-600">
+            <div>
+                Menampilkan <span class="font-semibold text-slate-800">@StartEntry</span>–<span class="font-semibold text-slate-800">@EndEntry</span> dari <span class="font-semibold text-slate-800">@FilteredUsers.Count</span> data
+            </div>
+            <div class="flex items-center gap-1.5">
+                <button type="button"
+                        class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                        disabled="@(currentPage <= 1)"
+                        @onclick="() => GoToPage(currentPage - 1)">
+                    Prev
+                </button>
+                @for (int p = 1; p <= TotalPages; p++)
+                {
+                    var pageNum = p;
+                    <button type="button"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer @(currentPage == pageNum ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50")"
+                            @onclick="() => GoToPage(pageNum)">
+                        @pageNum
+                    </button>
+                }
+                <button type="button"
+                        class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                        disabled="@(currentPage >= TotalPages)"
+                        @onclick="() => GoToPage(currentPage + 1)">
+                    Next
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<BaseModal IsOpen="@(detailingUser != null)"
+           Title="Detail Pengguna"
+           Subtitle="Informasi lengkap akun pengguna."
+           MaxWidthClass="max-w-md"
+           OnClose="() => detailingUser = null">
+    @if (detailingUser != null)
+    {
+        <div class="space-y-3 text-sm">
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">ID</span>
+                <span class="font-mono text-xs text-slate-800">@detailingUser.Id</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Full Name</span>
+                <span class="font-semibold text-slate-900">@detailingUser.FullName</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Username</span>
+                <span class="font-medium text-slate-800">@@@detailingUser.Username</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Status</span>
+                <span class="font-semibold @(detailingUser.IsLocked ? "text-red-600" : "text-emerald-600")">
+                    @(detailingUser.IsLocked ? "Terkunci (Locked)" : "Aktif")
+                </span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Gagal Login</span>
+                <span class="font-medium text-slate-800">@detailingUser.LoginFailed kali</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-slate-100">
+                <span class="text-slate-500">Dibuat Pada</span>
+                <span class="text-slate-700">@detailingUser.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+            </div>
+        </div>
+        <div class="flex justify-end mt-6">
+            <button type="button"
+                    class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white transition cursor-pointer"
+                    @onclick="() => detailingUser = null">
+                Tutup
+            </button>
+        </div>
+    }
+</BaseModal>
 
 <BaseModal IsOpen="@(editingUser != null)" Title="Edit Pengguna"
            Subtitle="Perbarui informasi atau atur status kunci akun secara manual." MaxWidthClass="max-w-md"
@@ -143,10 +259,54 @@
 @code {
     private List<UserDto> users = [];
     private bool isLoading = true;
+    private string searchQuery = string.Empty;
+    private int pageSize = 10;
+    private int currentPage = 1;
+
+    private List<UserDto> FilteredUsers => string.IsNullOrWhiteSpace(searchQuery)
+        ? users
+        : users.Where(u =>
+            u.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            u.Username.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            (u.IsLocked ? "terkunci locked" : "aktif").Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            $"{u.LoginFailed}".Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+            u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm").Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count / (double)pageSize));
+
+    private List<UserDto> PagedUsers => FilteredUsers
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+
+    private int StartEntry => FilteredUsers.Count == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+    private int EndEntry => Math.Min(currentPage * pageSize, FilteredUsers.Count);
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        searchQuery = e.Value?.ToString() ?? string.Empty;
+        currentPage = 1;
+    }
+
+    private void OnPageSizeChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var size) && size > 0)
+        {
+            pageSize = size;
+            currentPage = 1;
+        }
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = Math.Clamp(page, 1, TotalPages);
+    }
     private bool isSubmitting = false;
     private string alertMessage = string.Empty;
     private bool isAlertError = false;
 
+    private UserDto? detailingUser;
     private UserDto? editingUser;
     private string editFullName = string.Empty;
     private string editUsername = string.Empty;
@@ -154,10 +314,39 @@
     private bool editIsLocked;
 
     private UserDto? deletingUser;
+    private HubConnection? _hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadUsersAsync();
+
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5266/hubs/users")
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hubConnection.On("UserUpdated", async () =>
+        {
+            await LoadUsersAsync();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await _hubConnection.StartAsync();
+        }
+        catch
+        {
+            // Abaikan jika koneksi realtime belum tersedia saat ini
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
     }
 
     private async Task LoadUsersAsync()
@@ -173,6 +362,11 @@
         }
 
         users = data;
+    }
+
+    private void OpenDetailModal(UserDto user)
+    {
+        detailingUser = user;
     }
 
     private void OpenEditModal(UserDto user)

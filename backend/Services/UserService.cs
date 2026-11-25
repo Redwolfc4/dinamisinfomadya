@@ -1,7 +1,9 @@
 using backend.Data;
 using backend.DTOs;
+using backend.Hubs;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
@@ -12,10 +14,12 @@ public class UserService
     public const string Audience = "DinamisInfoMadyaClient";
 
     private readonly AppDbContext _context;
+    private readonly IHubContext<UserHub> _hubContext;
 
-    public UserService(AppDbContext context)
+    public UserService(AppDbContext context, IHubContext<UserHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     public async Task<object?> GetCurrentUserAsync(Guid userId)
@@ -34,11 +38,32 @@ public class UserService
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<UserDto>> GetAllUsersAsync()
+    public async Task<(List<UserDto> Items, int TotalCount)> GetAllUsersAsync(
+        string? search = null,
+        int page = 1,
+        int pageSize = 0)
     {
-        return await _context.Users
-            .AsNoTracking()
-            .OrderByDescending(u => u.CreatedAt)
+        var query = _context.Users.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim().ToLowerInvariant();
+            query = query.Where(u =>
+                u.FullName.ToLower().Contains(term) ||
+                u.Username.ToLower().Contains(term) ||
+                u.LoginFailed.ToString().Contains(term) ||
+                (u.IsLocked && ("terkunci".Contains(term) || "locked".Contains(term))) ||
+                (!u.IsLocked && "aktif".Contains(term)));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var ordered = query.OrderByDescending(u => u.CreatedAt);
+        IQueryable<User> pagedQuery = pageSize > 0
+            ? ordered.Skip((Math.Max(1, page) - 1) * pageSize).Take(pageSize)
+            : ordered;
+
+        var items = await pagedQuery
             .Select(u => new UserDto
             {
                 Id = u.Id,
@@ -50,6 +75,8 @@ public class UserService
                 UpdatedAt = u.UpdatedAt
             })
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task<(bool Success, string Message, UserDto? Data)> UpdateUserAsync(
@@ -103,6 +130,7 @@ public class UserService
         user.UpdatedBy = currentUserId;
 
         await _context.SaveChangesAsync();
+        await _hubContext.Clients.All.SendAsync("UserUpdated");
 
         return (true, "Data pengguna berhasil diperbarui.", new UserDto
         {
@@ -131,6 +159,7 @@ public class UserService
         user.UpdatedBy = currentUserId;
 
         await _context.SaveChangesAsync();
+        await _hubContext.Clients.All.SendAsync("UserUpdated");
 
         return (true, "Pengguna berhasil dihapus (soft delete).");
     }
