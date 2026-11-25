@@ -1,5 +1,6 @@
 @inject AuthApiService AuthApi
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="form-content-wrap">
     <!-- App Logo -->
@@ -140,6 +141,16 @@
                 await _passwordInput.FocusAsync();
             }
             return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(response.Token))
+        {
+            var storage = rememberMe ? "localStorage" : "sessionStorage";
+            await JS.InvokeVoidAsync($"{storage}.setItem", "dinamis_auth_token", response.Token);
+            if (!string.IsNullOrWhiteSpace(response.RefreshToken))
+            {
+                await JS.InvokeVoidAsync($"{storage}.setItem", "dinamis_refresh_token", response.RefreshToken);
+            }
         }
 
         showErrorAlert = false;

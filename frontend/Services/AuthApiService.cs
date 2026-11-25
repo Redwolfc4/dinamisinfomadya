@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using frontend.DTOs;
@@ -105,6 +106,26 @@ public class AuthApiService
                 Success = false,
                 Message = $"Tidak dapat terhubung ke server: {ex.Message}"
             };
+        }
+    }
+
+    public async Task<bool> ValidateTokenAsync(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, "api/auth/me");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await _http.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

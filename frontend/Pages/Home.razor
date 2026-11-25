@@ -1,5 +1,6 @@
 @page "/"
 @inject IJSRuntime JS
+@inject AuthApiService AuthApi
 @inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
@@ -22,8 +23,12 @@
             token = await JS.InvokeAsync<string?>("sessionStorage.getItem", "dinamis_auth_token");
         }
 
-        if (string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(token) || !await AuthApi.ValidateTokenAsync(token))
         {
+            await JS.InvokeVoidAsync("localStorage.removeItem", "dinamis_auth_token");
+            await JS.InvokeVoidAsync("localStorage.removeItem", "dinamis_refresh_token");
+            await JS.InvokeVoidAsync("sessionStorage.removeItem", "dinamis_auth_token");
+            await JS.InvokeVoidAsync("sessionStorage.removeItem", "dinamis_refresh_token");
             Navigation.NavigateTo("/login", replace: true);
             return;
         }
